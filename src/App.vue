@@ -17,7 +17,7 @@
         <v-btn flat v-for="item in menuItems" 
         :key="item.title"
         router
-         :to="item.link">
+         :to="item.link"> 
           <v-icon left>
           {{item.icon}}
           </v-icon>
