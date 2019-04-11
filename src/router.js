@@ -7,6 +7,8 @@ import Signup from '@/components/user/Signup.vue'
 import GroupWorkouts from '@/components/workouts/GroupWorkouts.vue'
 import PrivateWorkout from '@/components/workouts/PrivateWorkout.vue'
 import MyWorkouts from '@/components/workouts/MyWorkouts.vue'
+import CreateWorkout from '@/components/workouts/CreateWorkout.vue'
+import Workout from '@/components/workouts/Workout.vue'
 
 Vue.use(Router)
 
@@ -48,6 +50,18 @@ export default new Router({
       path: '/myw',
       name: 'MyWorkouts',
       component: MyWorkouts
+    },
+    {
+      path: '/crtw/new',
+      name: 'CreateWorkout',
+      component: CreateWorkout
+    },
+    {
+      path: '/workouts/:id',
+      name: 'Workout',
+      props: true,
+      component: Workout
     }
+
   ]
 })
