@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "es6-promise": "^4.2.6",
+    "firebase": "^5.9.4",
     "vue": "^2.6.6",
     "vue-router": "^3.0.1",
     "vuetify": "^1.5.5",

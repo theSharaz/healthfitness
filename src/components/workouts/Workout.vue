@@ -15,15 +15,15 @@
           <v-card-text>
             <div>
               <div class="info--text">
-                {{workout.date}}
+                {{workout.date | date}} - {{workout.location}}
               </div>
               <div >
-                A narrow wedge of light from a half-open service hatch at the twin mirrors. The color of its skin reminded him of Zone’s whores; it was a handgun and nine rounds of ammunition, and as he made his way down Shiga from the sushi stall he cradled it in his capsule in some coffin hotel, his hands clawed into the shadow of the console. She put his pistol down
+                {{workout.description}}
               </div>
             </div>       
           </v-card-text>
           <v-card-actions>
-            <v-spacer></v-spacer>
+          <v-spacer></v-spacer>
             <v-btn class="primary">Register</v-btn>
           </v-card-actions>
 

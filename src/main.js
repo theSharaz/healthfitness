@@ -5,6 +5,8 @@ import router from './router'
 import Vuetify from 'vuetify'
 import colors from 'vuetify/es5/util/colors'
 import { store } from './store'
+import DateFilter from './filters/date'
+import * as firebase from 'firebase'
 
 
 Vue.use(Vuetify, {
@@ -21,10 +23,21 @@ Vue.use(Vuetify, {
 
 Vue.config.productionTip = false
 
+Vue.filter('date', DateFilter)
 
 
 new Vue({
   router,
   store,
+  created () {
+     firebase.initializeApp({
+      apiKey: 'AIzaSyCmHWfjeiGTS_sw6mIUBPI3tTvK5NJX7Fk',
+      authDomain: 'healthfitness-93309.firebaseapp.com',
+      databaseURL: 'https://healthfitness-93309.firebaseio.com',
+      projectId: 'healthfitness-93309',
+      storageBucket: 'healthfitness-93309.appspot.com',
+      messagingSenderId: '570451847727'
+     })
+  },
   render: h => h(App)
 }).$mount('#app')

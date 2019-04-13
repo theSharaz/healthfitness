@@ -72,6 +72,7 @@ export default {
       menuItems: [
         {icon: 'fitness_center', title: 'Group Workouts', link: '/gw'},
         {icon: 'visibility_off', title: 'Private Workouts', link: '/pvtw'},
+        {icon: 'accessibility_new', title: 'Create Workout', link: '/crtw/new'},
         {icon: 'accessibility_new', title: 'My Workouts', link: '/myw'},
         {icon: 'person', title: 'Profile', link: '/prof'},
         {icon: 'face', title: 'Sign Up', link: '/sUp'},
