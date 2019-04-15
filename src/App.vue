@@ -66,25 +66,41 @@ import HelloWorld from './components/HelloWorld';
 import 'es6-promise/auto';
 
 export default {
+
   data () {
     return {
-      sideNav: false,
-      menuItems: [
-        {icon: 'fitness_center', title: 'Group Workouts', link: '/gw'},
-        {icon: 'visibility_off', title: 'Private Workouts', link: '/pvtw'},
-        {icon: 'accessibility_new', title: 'Create Workout', link: '/crtw/new'},
-        {icon: 'accessibility_new', title: 'My Workouts', link: '/myw'},
-        {icon: 'person', title: 'Profile', link: '/prof'},
+      sideNav: false
+    }
+  },
+  computed: {
+    menuItems () {
+      let menuItems = [
         {icon: 'face', title: 'Sign Up', link: '/sUp'},
-        {icon: 'lock_open', title: 'Sign In', link: '/sIn'}
+        {icon: 'lock_open', title: 'Sign In', link: '/sIn'}    
       ]
+      if (this.userIsAuthenticated) {
+        menuItems = [
+            {icon: 'fitness_center', title: 'Group Workouts', link: '/gw'},
+            {icon: 'visibility_off', title: 'Private Workouts', link: '/pvtw'},
+            {icon: 'accessibility_new', title: 'Create Workout', link: '/crtw/new'},
+            {icon: 'accessibility_new', title: 'My Workouts', link: '/myw'},
+            {icon: 'person', title: 'Profile', link: '/prof'}
+        ]
+      }
+      return menuItems 
+    },
+    userIsAuthenticated () {
+      return this.$store.getters.user !== null && this.$store.getters.user !== undefined
     }
   }
+
 }
 </script>
 
 <style lang="stylus">
   @import '~vuetify/src/stylus/main'
+
+  
 
 </style>
 

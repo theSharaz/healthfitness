@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import * as firebase from 'firebase'
+
 
 Vue.use(Vuex)
 
@@ -23,14 +25,25 @@ export const store = new Vuex.Store({
                 title: 'Workout in Lingang'
             }
           ],
-        user: {
-            id: 'Lily',
-            registeredWorkouts:['ww331']
-        }
+        user: null,
+        loading: false,
+        error: null
     },
     mutations: {
         createWorkout (state, payload) {
             state.loadedWorkouts.push(payload)
+        },
+        setUser (state, payload) {
+            state.user = payload
+        },
+        setLoading (state, payload) {
+            state.loading = payload
+        },
+        setError (state, payload) {
+            state.error = payload
+        },
+        clearError (state) {
+            state.error = null
         }
     },
     actions: {
@@ -45,6 +58,53 @@ export const store = new Vuex.Store({
             }
             //Reach out to firebase and store it
             commit('createWorkout', workout)
+        },
+        signUserUp ({commit}, payload) {
+            commit('setLoading', true)
+            commit('clearError')
+            firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
+            .then(
+                user => {
+                    commit('setLoading', false)
+                    const newUser = {
+                        id: user.UID,
+                        registeredWorkouts: []
+                    }
+                    commit('setUser', newUser)
+                }
+            )
+            .catch(
+                error => {
+                    commit('setLoading', false)
+                    commit('setError', error)
+                    console.log(error)
+                }
+            )
+        },
+        signUserIn ({commit}, payload) {
+            commit('setLoading', true)
+            commit('clearError')
+            firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
+            .then(
+                user => {
+                    commit('setLoading', false)
+                    const newUser = {
+                        id: user.UID,
+                        registeredWorkouts: []
+                    }
+                    commit('setUser', newUser)
+                }
+            )
+            .catch(
+                error => {
+                    commit('setLoading', false)
+                    commit('setError', error)
+                    console.log(error)
+                }
+            )            
+        },
+        clearError ({commit}) {
+            commit('clearError')
         }
     },
     getters: {
@@ -62,6 +122,15 @@ export const store = new Vuex.Store({
                     return workout.id === workoutid
                 })
             }
+        },
+        user (state) {
+            return state.user
+        },
+        error (state) {
+            return state.error
+        },
+        loading (state) {
+            return state.loading
         }
     }
 })
