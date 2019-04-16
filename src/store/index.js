@@ -17,7 +17,7 @@ export const store = new Vuex.Store({
                 title: 'Workout in Huinan'
             },
             {
-                imageUrl: 'http://www.newtowninstitute.org/newtowndata/NTimages/Lingang-130403-1_2.jpg', 
+                imageUrl: 'c', 
                 id: 'ww331', 
                 date: new Date(),
                 description: 'It is going to be fun',
@@ -30,6 +30,9 @@ export const store = new Vuex.Store({
         error: null
     },
     mutations: {
+        setLoadedWorkouts (state, payload) {
+            state.loadedWorkouts = payload
+        },
         createWorkout (state, payload) {
             state.loadedWorkouts.push(payload)
         },
@@ -47,17 +50,54 @@ export const store = new Vuex.Store({
         }
     },
     actions: {
+        loadWorkouts({commit}) {
+            commit('setLoading', true)
+            firebase.database().ref('workouts').once('value')
+            .then((data) => {
+                const workouts = []
+                const obj = data.val()
+                for (let key in obj) {
+                    workouts.push({
+                        id: key,
+                        title: obj[key].title,
+                        description: obj[key].description,
+                        imageUrl: obj[key].imageUrl,
+                        date: obj[key].date,
+                        location: obj[key].location
+
+                    })
+                }
+                commit('setLoadedWorkouts', workouts)
+                commit('setLoading', false)
+            })
+            .catch(
+                (error) => {
+                console.log(error)
+                commit('setLoading', true)
+                }
+            )
+        },
         createWorkout ({commit}, payload) {
             const workout = {
                 title: payload.title,
                 location: payload.location,
                 imageUrl: payload.imageUrl,
                 description: payload.description,
-                date: payload.date,
-                id: 'hjhjhk'
+                date: payload.date.toISOString()
             }
+            firebase.database().ref('workouts').push(workout)
+            .then((data) => {
+                const key = data.key
+                commit('createWorkout', {
+                    ...workout,
+                    id: key
+                })
+            })
+            .catch((error) => {
+                console.log(error)
+            })
             //Reach out to firebase and store it
-            commit('createWorkout', workout)
+            
         },
         signUserUp ({commit}, payload) {
             commit('setLoading', true)

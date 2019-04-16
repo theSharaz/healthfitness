@@ -9,7 +9,20 @@
         <v-btn large  router to='/pvtw' class='primary'>Private Workouts</v-btn>      
       </v-flex>
     </v-layout>
-    <v-layout row wrap mt-2>
+
+    <v-layout>
+      <v-flex xs12 class="text-xs-center">
+          <v-progress-linear 
+          :indeterminate="true"
+          v-if="loading"
+          class="info"
+          >
+          
+          </v-progress-linear>
+      </v-flex>
+    </v-layout>
+
+    <v-layout row wrap mt-2 v-if="!loading">
       <v-flex xs12>  
 
         <v-carousel style="cursor: pointer" hide-delimiters>
@@ -41,6 +54,9 @@
     computed: {
       workouts () {
         return this.$store.getters.featuredWorkouts
+      },
+      loading () {
+        return this.$store.getters.loading
       }
     },
     methods: {

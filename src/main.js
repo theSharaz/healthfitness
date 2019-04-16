@@ -40,6 +40,7 @@ new Vue({
       storageBucket: 'healthfitness-93309.appspot.com',
       messagingSenderId: '570451847727'
      })
+     this.$store.dispatch('loadWorkouts')
   },
   render: h => h(App)
 }).$mount('#app')
