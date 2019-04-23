@@ -6,7 +6,7 @@
         <v-card>
 
           <v-card-title>
-            <h4 class="primary--text">{{workout.title}}</h4>
+            <h3 class="white--text">{{workout.title}}</h3>
           </v-card-title>
           <v-img
             :src="workout.imageUrl"

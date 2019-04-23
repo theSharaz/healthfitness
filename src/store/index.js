@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import * as firebase from 'firebase'
 
 
+
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
@@ -63,7 +64,8 @@ export const store = new Vuex.Store({
                         description: obj[key].description,
                         imageUrl: obj[key].imageUrl,
                         date: obj[key].date,
-                        location: obj[key].location
+                        location: obj[key].location,
+                        creatorId: obj[key].creatorId
 
                     })
                 }
@@ -77,26 +79,49 @@ export const store = new Vuex.Store({
                 }
             )
         },
-        createWorkout ({commit}, payload) {
+        createWorkout ({commit, getters, state}, payload) {
+
+            // console.log('tapinda 0 ')
+            // console.log({id: firebase.auth().currentUser.uid})
+            // console.log('tapinda 1')
+            // console.log(state.user.id)
+            // console.log('tapinda 2')
+            // console.log(getters.user.uid)
+
+
             const workout = {
                 title: payload.title,
                 location: payload.location,
-                imageUrl: payload.imageUrl,
                 description: payload.description,
-                date: payload.date.toISOString()
+                date: payload.date.toISOString(),
+                creatorId: firebase.auth().currentUser.uid
             }
+            let imageUrl
+            let key
             firebase.database().ref('workouts').push(workout)
             .then((data) => {
-                const key = data.key
+                key = data.key
+                return key
+            })
+            .then(key => {
+                const filename = payload.image.name
+                const ext = filename.slice(filename.lastIndexOf('.'))
+                return firebase.storage().ref('workouts/' + key + '' + ext).put(payload.image)
+            })
+            .then(fileData => {
+                imageUrl = fileData.metada.downloadURLs[0]
+                return firebase.database().ref('workouts').child(key).update({imageUrl: imageUrl})
+            })
+            .then(() => {
                 commit('createWorkout', {
                     ...workout,
+                    imageUrl: imageUrl,
                     id: key
                 })
             })
             .catch((error) => {
                 console.log(error)
             })
-            //Reach out to firebase and store it
             
         },
         signUserUp ({commit}, payload) {
@@ -107,7 +132,7 @@ export const store = new Vuex.Store({
                 user => {
                     commit('setLoading', false)
                     const newUser = {
-                        id: user.UID,
+                        id: user.user.uid,
                         registeredWorkouts: []
                     }
                     commit('setUser', newUser)
@@ -129,10 +154,16 @@ export const store = new Vuex.Store({
                 user => {
                     commit('setLoading', false)
                     const newUser = {
-                        id: user.UID,
+                        id: user.user.uid,
                         registeredWorkouts: []
                     }
-                    commit('setUser', newUser)
+                    console.log('logged in below 00')
+                    console.log(newUser.id)
+                    store.commit('setUser', newUser)
+                    console.log('logged in below 0')
+                    console.log(newUser.id)
+                    console.log('logged in below 1')
+                    console.log(user.user.uid)
                 }
             )
             .catch(
@@ -142,6 +173,13 @@ export const store = new Vuex.Store({
                     console.log(error)
                 }
             )            
+        },
+        autoSignIn ({commit}, payload) {
+            commit('setUser', {id: payload.UID, registeredWorkouts: []})
+        },
+        logout ({commit}) {
+            firebase.auth().signOut()
+            commit('setUser', null)
         },
         clearError ({commit}) {
             commit('clearError')

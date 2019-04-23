@@ -46,8 +46,7 @@
               <v-layout row>
                 <v-flex xs12>
                 <v-btn @click="onSignin"
-                  :disabled="loading"
-                  :loading="loading"
+                  
                   >
                     Sign In
 
@@ -102,6 +101,7 @@
 
     methods: {
       onSignin () {
+        
         this.$store.dispatch('signUserIn', {email: this.email, password: this.password})
       },
       onDismissed () {

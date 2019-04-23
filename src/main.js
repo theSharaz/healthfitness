@@ -40,6 +40,11 @@ new Vue({
       storageBucket: 'healthfitness-93309.appspot.com',
       messagingSenderId: '570451847727'
      })
+     firebase.auth().onAuthStateChanged((user) => {
+       if (user) {
+         this.$store.dispatch('autoSignIn', user)
+       }
+     })
      this.$store.dispatch('loadWorkouts')
   },
   render: h => h(App)

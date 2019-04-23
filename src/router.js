@@ -9,6 +9,7 @@ import PrivateWorkout from '@/components/workouts/PrivateWorkout.vue'
 import MyWorkouts from '@/components/workouts/MyWorkouts.vue'
 import CreateWorkout from '@/components/workouts/CreateWorkout.vue'
 import Workout from '@/components/workouts/Workout.vue'
+import AuthGuard from './auth-guard'
 
 Vue.use(Router)
 
@@ -24,7 +25,8 @@ export default new Router({
     {
       path: '/prof',
       name: 'Profile',
-      component: Profile
+      component: Profile,
+      beforeEnter: AuthGuard
     },
     {
       path: '/sIn',
@@ -39,7 +41,7 @@ export default new Router({
     {
       path: '/gw',
       name: 'GroupWorkouts',
-      component: GroupWorkouts
+      component: GroupWorkouts,
     },
     {
       path: '/pvtw',
@@ -54,7 +56,8 @@ export default new Router({
     {
       path: '/crtw/new',
       name: 'CreateWorkout',
-      component: CreateWorkout
+      component: CreateWorkout,
+      beforeEnter: AuthGuard
     },
     {
       path: '/workouts/:id',
