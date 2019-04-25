@@ -17,7 +17,6 @@
           v-if="loading"
           class="info"
           >
-          
           </v-progress-linear>
       </v-flex>
     </v-layout>

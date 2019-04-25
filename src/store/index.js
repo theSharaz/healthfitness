@@ -37,6 +37,21 @@ export const store = new Vuex.Store({
         createWorkout (state, payload) {
             state.loadedWorkouts.push(payload)
         },
+        updateWorkout (state, payload) {
+            const workout = state.loadedWorkouts.find(workout => {
+                return workout.id === payload.id
+            })
+            if (payload.title) {
+                workout.title = payload.title
+            }
+            if (payload.description) {
+                workout.description = payload.description
+            }
+            if (payload.date) {
+                workout.date = payload.date
+            }
+
+        },
         setUser (state, payload) {
             state.user = payload
         },
@@ -109,19 +124,49 @@ export const store = new Vuex.Store({
                 return firebase.storage().ref('workouts/' + key + '' + ext).put(payload.image)
             })
             .then(fileData => {
-                imageUrl = fileData.metada.downloadURLs[0]
+                let fullPath = fileData.metadata.fullPath
+                return firebase.storage().ref(fullPath).getDownloadURL()
+              })
+            .then(URL => {
+                imageUrl = URL
                 return firebase.database().ref('workouts').child(key).update({imageUrl: imageUrl})
             })
             .then(() => {
                 commit('createWorkout', {
                     ...workout,
-                    imageUrl: imageUrl,
+                    imageUrl:imageUrl,
                     id: key
                 })
             })
             .catch((error) => {
                 console.log(error)
             })
+            
+        },
+        updateWorkoutData ({commit}, payload) {
+            commit('setLoading', true)
+            const updateObj = {}
+            if (payload.title) {
+                updateObj.title = payload.title
+            }
+            if (payload.description) {
+                updateObj.description = payload.description
+            }
+            if (payload.date) {
+                updateObj.date = payload.date
+            }
+            firebase.database().ref('workouts').child(payload.id).update(updateObj)
+            .then(() => {
+                commit('setLoading', false)
+                commit('updateWorkout', payload)
+            })
+            .catch(
+                error => {
+                    commit('setLoading', false)
+                    // commit('setError', error)
+                    console.log(error)
+                }
+            )
             
         },
         signUserUp ({commit}, payload) {
@@ -157,13 +202,14 @@ export const store = new Vuex.Store({
                         id: user.user.uid,
                         registeredWorkouts: []
                     }
-                    console.log('logged in below 00')
-                    console.log(newUser.id)
+                    // console.log('logged in below 00')
+                    // console.log(newUser.id)
                     store.commit('setUser', newUser)
-                    console.log('logged in below 0')
-                    console.log(newUser.id)
-                    console.log('logged in below 1')
-                    console.log(user.user.uid)
+                    // console.log('id from store')
+                    // console.log(store.getters.user.id)
+                    // console.log('logged in below 1')
+                    // console.log(user.user.uid)
+                    
                 }
             )
             .catch(
@@ -175,7 +221,9 @@ export const store = new Vuex.Store({
             )            
         },
         autoSignIn ({commit}, payload) {
-            commit('setUser', {id: payload.UID, registeredWorkouts: []})
+            // console.log('store commit')
+            // console.log(payload.uid)
+            commit('setUser', {id: payload.uid, registeredWorkouts: []})
         },
         logout ({commit}) {
             firebase.auth().signOut()

@@ -8,6 +8,7 @@ import { store } from './store'
 import DateFilter from './filters/date'
 import * as firebase from 'firebase'
 import AlertCmp from './components/shared/Alert.vue'
+import EditWorkoutDetailsDialog from './components/workouts/Edit/EditWorkoutDetailsDialog.vue'
 
 
 Vue.use(Vuetify, {
@@ -26,6 +27,7 @@ Vue.config.productionTip = false
 
 Vue.filter('date', DateFilter)
 Vue.component('app-alert', AlertCmp)
+Vue.component('app-edit-workout-details-dialog', EditWorkoutDetailsDialog)
 
 
 new Vue({
