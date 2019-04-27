@@ -99,7 +99,7 @@ export const store = new Vuex.Store({
             // console.log('tapinda 0 ')
             // console.log({id: firebase.auth().currentUser.uid})
             // console.log('tapinda 1')
-            // console.log(state.user.id)
+            // console.log(payload.date.toISOString())
             // console.log('tapinda 2')
             // console.log(getters.user.uid)
 
@@ -111,6 +111,8 @@ export const store = new Vuex.Store({
                 date: payload.date.toISOString(),
                 creatorId: firebase.auth().currentUser.uid
             }
+
+            
             let imageUrl
             let key
             firebase.database().ref('workouts').push(workout)

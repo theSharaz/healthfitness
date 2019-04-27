@@ -34,6 +34,16 @@
               <div class="info--text">
                 {{workout.date | date}} - {{workout.location}}
               </div>
+              <div> 
+                <app-edit-workout-date-dialog 
+                :workout="workout"
+                v-if="userIsCreator">
+                </app-edit-workout-date-dialog> 
+                <app-edit-workout-time-dialog
+                :workout="workout"
+                v-if="userIsCreator">
+                </app-edit-workout-time-dialog>
+              </div>
               <div >
                 {{workout.description}}
               </div>

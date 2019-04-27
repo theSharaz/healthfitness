@@ -145,6 +145,10 @@
     
     methods: {
       onCreateWorkout () {
+
+        console.log('submittable time')
+        console.log(this.submittableDateTime)
+
           if (!this.formIsValid) {
             return 
           }  
