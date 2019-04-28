@@ -11,6 +11,7 @@ import AlertCmp from './components/shared/Alert.vue'
 import EditWorkoutDetailsDialog from './components/workouts/Edit/EditWorkoutDetailsDialog.vue'
 import EditWorkoutDateDialog from './components/workouts/Edit/EditWorkoutDateDialog.vue'
 import EditWorkoutTimeDialog from './components/workouts/Edit/EditWorkoutTimeDialog.vue'
+import RegisterDialog from './components/workouts/Registration/RegisterDialog.vue'
 
 
 Vue.use(Vuetify, {
@@ -32,6 +33,7 @@ Vue.component('app-alert', AlertCmp)
 Vue.component('app-edit-workout-details-dialog', EditWorkoutDetailsDialog)
 Vue.component('app-edit-workout-date-dialog', EditWorkoutDateDialog)
 Vue.component('app-edit-workout-time-dialog', EditWorkoutTimeDialog)
+Vue.component('app-workout-register-dialog', RegisterDialog)
 
 
 new Vue({
@@ -48,8 +50,9 @@ new Vue({
      })
      firebase.auth().onAuthStateChanged((user) => {
        if (user) {
-         this.$store.dispatch('autoSignIn', user)
-       }
+        this.$store.dispatch('autoSignIn', user)
+        this.$store.dispatch('fetchUserData')
+      }
      })
      this.$store.dispatch('loadWorkouts')
   },

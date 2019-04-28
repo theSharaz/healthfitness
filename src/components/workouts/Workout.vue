@@ -51,7 +51,10 @@
           </v-card-text>
           <v-card-actions>
           <v-spacer></v-spacer>
-            <v-btn class="primary">Register</v-btn>
+            <app-workout-register-dialog 
+            :workoutId="workout.id" 
+            v-if="userIsAuthenticated && !userIsCreator">
+            </app-workout-register-dialog>
           </v-card-actions>
 
         </v-card>
