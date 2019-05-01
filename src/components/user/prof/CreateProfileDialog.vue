@@ -155,16 +155,18 @@
           }  
           if (!this.image) {
             return 
-          }                  
-        // const profileData = {
-        //   name: this.name,
-        //   phone: this.phone,
-        //   image: this.image,
-        //   weight: this.weight,
-        //   height: this.height
-        // }
-        // this.$store.dispatch('createProfile', profileData)
-        // this.$router.push('/prof')
+          }             
+          this.profDialog = false
+
+        const profileData = {
+          name: this.name,
+          phone: this.phone,
+          image: this.image,
+          weight: this.weight,
+          height: this.height
+        }
+        this.$store.dispatch('createProfile', profileData)
+        this.$router.push('/prof')
       },
       onPickFile() {
         this.$refs.fileInput.click()

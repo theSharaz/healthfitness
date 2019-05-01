@@ -7,6 +7,15 @@ export default {
         user: null
     },
     mutations: {
+        createProfile (state, payload) {
+            const id = payload.id
+            //security to make sure no double registrations
+            // if(state.user.profile.findIndex(workout => workout.id === id) >= 0) {
+            //     return
+            // }
+            state.user.profile.push(payload)
+            
+        },
         registerUserForWorkout (state, payload) {
             const id = payload.id
             //security to make sure no double registrations
@@ -153,6 +162,46 @@ export default {
                     }
                 )
 
+        },
+        createProfile ({commit, getters}, payload) {
+            const user = getters.user
+            const profile = {
+                name: payload.name,
+                phone: payload.phone,
+                weight: payload.weight,
+                height: payload.height,
+            }
+
+            
+            let imageUrl
+            let key
+            firebase.database().ref('profiles').child(user.id)
+            .update(payload)
+            .then((data) => {
+                const filename = payload.image.name
+                const ext = filename.slice(filename.lastIndexOf('.'))
+                return firebase.storage().ref('profiles/' + user.id + '' + ext).put(payload.image)
+            })
+            .then(fileData => {
+                let fullPath = fileData.metadata.fullPath
+                return firebase.storage().ref(fullPath).getDownloadURL()
+              })
+            .then(URL => {
+                imageUrl = URL
+                return firebase.database().ref('profiles').child(user.id).update({imageUrl: imageUrl})
+            })
+            .then(() => {
+                commit('createProfile', {
+                    ...profile,
+                    imageUrl:imageUrl,
+                    id: user.id
+                })
+            })
+            
+            .catch((error) => {
+                console.log(error)
+            })
+            
         },
         logout ({commit}) {
             firebase.auth().signOut()
