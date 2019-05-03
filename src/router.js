@@ -25,8 +25,7 @@ export default new Router({
     {
       path: '/prof',
       name: 'Profile',
-      component: Profile,
-      beforeEnter: AuthGuard
+      component: Profile
     },
     {
       path: '/sIn',

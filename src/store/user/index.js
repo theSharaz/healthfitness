@@ -209,13 +209,15 @@ export default {
                 })
                 .catch(
                     error => {
-                        console.log(error)
                         commit('setLoading', false)
+                        console.log(error)
                     }
                 )
 
         },
         createProfile ({commit, getters}, payload) {
+            commit('setLoading', true)
+
             const user = getters.user
 
             // console.log("Create user email from getter")
@@ -263,7 +265,92 @@ export default {
                     fbKeys: getters.user.fbKeys,
                     profile: profile
                 }
+                commit('setLoading', false)
                 commit('setUser', updatedUser)
+
+                console.log('create profile email here')
+                console.log(getters.user.profile)
+
+
+            })
+            
+            .catch((error) => {
+                commit('setLoading', false)
+                console.log(error)
+            })
+            
+        },
+        updateProfile ({commit, getters}, payload) {
+            commit('setLoading', true)
+            const user = getters.user
+
+            // console.log("Create user email from getter")
+            // console.log(getters.user.email)
+            const updateObj = {}
+            if (payload.name) {
+                updateObj.name = payload.name
+            }
+            if (payload.phone) {
+                updateObj.phone = payload.phone
+            }
+            if (payload.weight) {
+                updateObj.weight = payload.weight
+            }
+            if (payload.height) {
+                updateObj.height = payload.height
+            }
+            if (payload.email) {
+                updateObj.email = payload.email
+            }
+            if (payload.image) {
+                updateObj.image = payload.image
+            }
+
+
+            const profile = {
+                name: updateObj.name,
+                phone: updateObj.phone,
+                weight: updateObj.weight,
+                height: updateObj.height,
+                email: updateObj.email,
+            }
+
+            // console.log('profile email here')
+            // console.log(profile.email)
+            
+            let imageUrl
+            let key
+            firebase.database().ref('profiles').child(user.id)
+            .update(profile)
+            .then((data) => {
+                const filename = payload.image.name
+                const ext = filename.slice(filename.lastIndexOf('.'))
+                return firebase.storage().ref('profiles/' + user.id + '' + ext).put(payload.image)
+            })
+            .then(fileData => {
+                let fullPath = fileData.metadata.fullPath
+                return firebase.storage().ref(fullPath).getDownloadURL()
+              })
+            .then(URL => {
+                imageUrl = URL
+                return firebase.database().ref('profiles').child(user.id).update({imageUrl: imageUrl})
+            })
+            .then(() => {
+                commit('createProfile', {
+                    ...profile,
+                    imageUrl:imageUrl,
+                    id: user.id
+                })
+                profile.imageUrl = imageUrl
+                const updatedUser = {
+                    id: getters.user.id,
+                    email: getters.user.email,
+                    registeredWorkouts: getters.user.registeredWorkouts,
+                    fbKeys: getters.user.fbKeys,
+                    profile: profile
+                }
+                commit('setUser', updatedUser)
+                commit('setLoading', false)
 
                 console.log('create profile email here')
                 console.log(getters.user.profile)
