@@ -166,7 +166,7 @@
           height: this.height
         }
         this.$store.dispatch('createProfile', profileData)
-        this.$router.push('/prof')
+        // this.$router.push('/prof')
       },
       onPickFile() {
         this.$refs.fileInput.click()

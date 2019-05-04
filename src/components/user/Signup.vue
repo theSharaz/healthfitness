@@ -56,7 +56,19 @@
                   </v-text-field>
                 </v-flex>
               </v-layout>
-              
+
+              <v-layout row>
+                <v-flex xs12>
+                  <v-select
+                    name="type"
+                    :items="userType"
+                    v-model="type"
+                    label="User Type"
+                    required
+                    ></v-select>
+                </v-flex>
+              </v-layout>
+
               <v-layout row>
                 <v-flex xs12>
                   <v-btn @click="onSignup" 
@@ -90,7 +102,9 @@
       return {
         email: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        type: '',
+        userType: ['trainer', 'normal']
       }
     },
 
@@ -120,7 +134,7 @@
 
     methods: {
       onSignup () {
-        this.$store.dispatch('signUserUp', {email: this.email, password: this.password})
+        this.$store.dispatch('signUserUp', {email: this.email, password: this.password, type: this.type})
       },
       onDismissed () {
         this.$store.dispatch('clearError')

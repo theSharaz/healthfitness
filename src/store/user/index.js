@@ -7,12 +7,12 @@ export default {
         user: null
     },
     mutations: {
-        createProfile (state, payload) {
+        setUserType (state, payload) {
             const id = payload.id
-            //security to make sure no double registrations
-            // if(state.user.profile.findIndex(workout => workout.id === id) >= 0) {
-            //     return
-            // }
+            state.user.type = payload.type
+            
+        },
+        setProfile (state, payload) {
             state.user.profile = payload
             
         },
@@ -68,7 +68,7 @@ export default {
                     commit('setLoading', false)
                 })
         },
-        signUserUp ({commit}, payload) {
+        signUserUp ({commit, getters}, payload) {
             commit('setLoading', true)
             commit('clearError')
             firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
@@ -82,8 +82,30 @@ export default {
                         fbKeys: {}
                     }
                     commit('setUser', newUser)
+
+                    // console.log('User')
+                    // console.log(getters.user)
+    
                 }
             )
+            .then(() => {
+
+                const user = getters.user
+
+                return firebase.database().ref('userType').child(user.id).update({type: payload.type})
+            })
+            .then(() => {
+
+                commit('setUserType', payload.type)
+                commit('setLoading', false)
+
+                console.log('payload Type')
+                console.log(payload.type)
+                console.log('User Type')
+                console.log(getters.user.type)
+
+
+            })
             .catch(
                 error => {
                     commit('setLoading', false)
@@ -187,25 +209,40 @@ export default {
                     const obj = data.val()
                     let userprofile = obj
 
-                    console.log("fetch user profile email")
-                    console.log(getters.user.email)
-
-                    const updatedUser = {
-                        id: getters.user.id,
-                        email: getters.user.email,
-                        /// WTF ain't the email working
-                        registeredWorkouts: getters.user.registeredWorkouts,
-                        fbKeys: getters.user.fbKeys,
-                        profile: userprofile,
-                    }
-                    console.log("profile data")
-                    console.log(updatedUser)
+                    // console.log("fetch user profile email")
+                    // console.log(getters.user.email)
+                    commit('setProfile', userprofile)
+                    // console.log("profile set")
+                    // console.log(getters.user.profile)
 
                     commit('setLoading', false)
-                    commit('setUser', updatedUser)
 
-                    console.log("User prof taken from db")
-                    console.log(getters.user)
+
+                    // console.log("User prof taken from db")
+                    // console.log(getters.user)
+                })
+                .catch(
+                    error => {
+                        commit('setLoading', false)
+                        console.log(error)
+                    }
+                )
+
+        },        
+        fetchUserType ({commit, getters}) {
+            commit('setLoading', true)
+            firebase.database().ref('/userType/' + getters.user.id).once
+            ('value')
+                .then (data => {
+                    const obj = data.val()
+                    let type = obj
+
+                    commit('setUserType', type)
+
+                    console.log("user type set")
+                    console.log(getters.user.type)
+
+                    commit('setLoading', false)
                 })
                 .catch(
                     error => {
@@ -252,23 +289,12 @@ export default {
                 return firebase.database().ref('profiles').child(user.id).update({imageUrl: imageUrl})
             })
             .then(() => {
-                commit('createProfile', {
-                    ...profile,
-                    imageUrl:imageUrl,
-                    id: user.id
-                })
-                profile.imageUrl = imageUrl
-                const updatedUser = {
-                    id: getters.user.id,
-                    email: getters.user.email,
-                    registeredWorkouts: getters.user.registeredWorkouts,
-                    fbKeys: getters.user.fbKeys,
-                    profile: profile
-                }
-                commit('setLoading', false)
-                commit('setUser', updatedUser)
 
-                console.log('create profile email here')
+                profile.imageUrl = imageUrl
+                commit('setLoading', false)
+                commit('setProfile', profile)
+
+                console.log('created profile')
                 console.log(getters.user.profile)
 
 
@@ -299,9 +325,6 @@ export default {
             if (payload.height) {
                 updateObj.height = payload.height
             }
-            if (payload.email) {
-                updateObj.email = payload.email
-            }
             if (payload.image) {
                 updateObj.image = payload.image
             }
@@ -312,7 +335,8 @@ export default {
                 phone: updateObj.phone,
                 weight: updateObj.weight,
                 height: updateObj.height,
-                email: updateObj.email,
+                email: getters.user.profile.email,
+
             }
 
             // console.log('profile email here')
@@ -336,21 +360,19 @@ export default {
                 return firebase.database().ref('profiles').child(user.id).update({imageUrl: imageUrl})
             })
             .then(() => {
-                commit('createProfile', {
-                    ...profile,
-                    imageUrl:imageUrl,
-                    id: user.id
-                })
                 profile.imageUrl = imageUrl
-                const updatedUser = {
-                    id: getters.user.id,
-                    email: getters.user.email,
-                    registeredWorkouts: getters.user.registeredWorkouts,
-                    fbKeys: getters.user.fbKeys,
-                    profile: profile
-                }
-                commit('setUser', updatedUser)
+         
+                // profile.imageUrl = imageUrl
+                // const updatedUser = {
+                //     id: getters.user.id,
+                //     email: getters.user.email,
+                //     registeredWorkouts: getters.user.registeredWorkouts,
+                //     fbKeys: getters.user.fbKeys,
+                //     profile: profile
+                // }
+                // commit('setUser', updatedUser)
                 commit('setLoading', false)
+                commit('setProfile', profile)
 
                 console.log('create profile email here')
                 console.log(getters.user.profile)

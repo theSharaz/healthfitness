@@ -40,6 +40,7 @@
 
     <main>
 
+
       <router-view></router-view>
 
     </main>
@@ -102,11 +103,17 @@ export default {
         {icon: 'face', title: 'Sign Up', link: '/sUp'},
         {icon: 'lock_open', title: 'Sign In', link: '/sIn'}    
       ]
-      if (this.userIsAuthenticated) {
+      if (this.userIsAuthenticated && !this.userIsNormal) {
         menuItems = [
             {icon: 'fitness_center', title: 'Group Workouts', link: '/gw'},
             {icon: 'visibility_off', title: 'Private Workouts', link: '/pvtw'},
             {icon: 'accessibility_new', title: 'Create Workout', link: '/crtw/new'},
+            {icon: 'person', title: 'Profile', link: '/prof'}
+        ]
+      }
+      if(this.userIsAuthenticated && this.userIsNormal) {
+        menuItems = [
+            {icon: 'fitness_center', title: 'Group Workouts', link: '/gw'},
             {icon: 'accessibility_new', title: 'My Workouts', link: '/myw'},
             {icon: 'person', title: 'Profile', link: '/prof'}
         ]
@@ -115,6 +122,11 @@ export default {
     },
     userIsAuthenticated () {
       return this.$store.getters.user !== null && this.$store.getters.user !== undefined
+    },
+    userIsNormal () {
+      console.log("user type from app")
+      console.log(this.$store.getters.user.type)
+      return this.$store.getters.user.type === 'normal' || this.$store.getters.user.type === 'NORMAL'
     }
   },
   methods: {
@@ -122,6 +134,9 @@ export default {
       this.$store.dispatch('logout')
       this.$router.push('/')
     }
+  },
+  created () {
+    // this.userIsNormal()
   }
 
 }

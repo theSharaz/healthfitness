@@ -12,7 +12,7 @@
       </v-flex>
     </v-layout>
 
-    <v-layout align-center justify-center row  v-if="!profileIsAvailable">
+    <v-layout align-center justify-center row  v-if="!profileIsAvailable && !loading">
       <v-flex xs12>
         <v-card>
 
