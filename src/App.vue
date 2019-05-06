@@ -103,7 +103,18 @@ export default {
         {icon: 'face', title: 'Sign Up', link: '/sUp'},
         {icon: 'lock_open', title: 'Sign In', link: '/sIn'}    
       ]
-      if (this.userIsAuthenticated && !this.userIsNormal) {
+
+      if(this.userIsAuthenticated && this.userIsNormal) {
+              console.log("Normal menu activated")
+
+        menuItems = [
+            {icon: 'fitness_center', title: 'Group Workouts', link: '/gw'},
+            {icon: 'accessibility_new', title: 'My Workouts', link: '/myw'},
+            {icon: 'person', title: 'Profile', link: '/prof'}
+        ]
+      }
+      else if (this.userIsAuthenticated && !this.userIsNormal) {
+                      console.log("Trainer menu activated")
         menuItems = [
             {icon: 'fitness_center', title: 'Group Workouts', link: '/gw'},
             {icon: 'visibility_off', title: 'Private Workouts', link: '/pvtw'},
@@ -111,21 +122,15 @@ export default {
             {icon: 'person', title: 'Profile', link: '/prof'}
         ]
       }
-      if(this.userIsAuthenticated && this.userIsNormal) {
-        menuItems = [
-            {icon: 'fitness_center', title: 'Group Workouts', link: '/gw'},
-            {icon: 'accessibility_new', title: 'My Workouts', link: '/myw'},
-            {icon: 'person', title: 'Profile', link: '/prof'}
-        ]
-      }
+
       return menuItems 
     },
     userIsAuthenticated () {
       return this.$store.getters.user !== null && this.$store.getters.user !== undefined
     },
     userIsNormal () {
-      console.log("user type from app")
-      console.log(this.$store.getters.user.type)
+      console.log("check normal user FROM APP.vue")
+      console.log(this.$store.getters.user)
       return this.$store.getters.user.type === 'normal' || this.$store.getters.user.type === 'NORMAL'
     }
   },
@@ -136,7 +141,9 @@ export default {
     }
   },
   created () {
-    // this.userIsNormal()
+    this.userIsNormal
+    this.menuItems
+
   }
 
 }

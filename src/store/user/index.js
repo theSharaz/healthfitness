@@ -7,15 +7,6 @@ export default {
         user: null
     },
     mutations: {
-        setUserType (state, payload) {
-            const id = payload.id
-            state.user.type = payload.type
-            
-        },
-        setProfile (state, payload) {
-            state.user.profile = payload
-            
-        },
         registerUserForWorkout (state, payload) {
             const id = payload.id
             //security to make sure no double registrations
@@ -71,6 +62,7 @@ export default {
         signUserUp ({commit, getters}, payload) {
             commit('setLoading', true)
             commit('clearError')
+            let theNoob = null
             firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
             .then(
                 user => {
@@ -83,8 +75,12 @@ export default {
                     }
                     commit('setUser', newUser)
 
-                    // console.log('User')
-                    // console.log(getters.user)
+                    theNoob = {
+                        ...newUser
+                    }
+
+                    console.log('User')
+                    console.log(getters.user)
     
                 }
             )
@@ -96,14 +92,41 @@ export default {
             })
             .then(() => {
 
-                commit('setUserType', payload.type)
-                commit('setLoading', false)
+                theNoob = {
+                    ...theNoob,
+                    type: payload.type
+                }
+                // commit('setUserType', payload.type)
+                // commit('setLoading', false)
 
-                console.log('payload Type')
+                // console.log('payload Type')
+                // console.log(payload.type)
+                // console.log('User Type')
+                // console.log(getters.user.type)
+
+
+            })
+            .then(() => {
+
+                const user = getters.user
+                console.log('PAYLOAD Type')
                 console.log(payload.type)
-                console.log('User Type')
-                console.log(getters.user.type)
+                if(payload.type === 'normal' || 'NORMAL') {
+                    return firebase.database().ref('membership').child(user.id).update({status: 'none'})
+                }
+            })
+            .then(() => {
 
+
+                theNoob = {
+                    ...theNoob,
+                    membership: none
+                }
+
+                commit('setUser', theNoob)
+                console.log('the Noob is SET')
+                console.log(getters.user)
+                commit('setLoading', false)
 
             })
             .catch(
@@ -166,6 +189,7 @@ export default {
         },
         fetchUserData ({commit, getters}) {
             commit('setLoading', true)
+            let LeUser = null
             firebase.database().ref('/users/' + getters.user.id + '/registrations').once
             ('value')
                 .then (data => {
@@ -177,77 +201,82 @@ export default {
                         swappedPairs[dataPairs[key]] = key
                     }
 
-                    
-                    // console.log('email before fetch data')
-                    // console.log(getters.user.email)
-
                     const updatedUser = {
                         id: getters.user.id,
                         email: getters.user.email,
                         registeredWorkouts: registeredWorkouts,
                         fbKeys: swappedPairs
                     }
-                    commit('setLoading', false)
-                    commit('setUser', updatedUser)
 
-                    // console.log('email after fetch data')
-                    // console.log(getters.user.email)
+                    LeUser = updatedUser
+
+                })
+                .then(() => {
+                    console.log("user id after data")
+                    console.log(getters.user.id)
+                    firebase.database().ref('/profiles/' + getters.user.id).once
+                    ('value')
+                        .then (data => {
+                            const obj = data.val()
+                            let userprofile = obj
+
+                            LeUser = {
+                                ...LeUser,
+                                profile: userprofile
+                            }
+                           
+                            console.log("LeUser after profile added")
+                            console.log(LeUser)
+        
+                        })
+                })
+                .then(() => {
+                    firebase.database().ref('/userType/' + getters.user.id).once
+                    ('value')
+                        .then (data => {
+                            const obj = data.val()
+                            let type = obj
+        
+                            LeUser = {
+                                ...LeUser,
+                                type: type
+                            }
+        
+                        })  
+
+                })
+                // .then(() => {
+                //     if(LeUser.type === 'normal' || 'NORMAL') {
+
+                //         console.log('NORMAL USER MEMBERSHIP STATUS')
+
+
+                //         firebase.database().ref('/membership/' + getters.user.id).once
+                //         ('value')
+                //             .then (data => {
+                //                 const obj = data.val()
+                //                 let membership = obj
+            
+                //                 LeUser = {
+                //                     ...LeUser,
+                //                     membership: membership.membership
+                //                 }
+                //             })  
+                //     }
+
+                // })
+                .then(() => {
+                    console.log('USER SET')
+                    commit('setUser', LeUser)
+                    console.log(getters.user)
+                    commit('setLoading', false)
+
+    
                 })
                 .catch(
                     error => {
                         console.log(error)
                         commit('setLoading', false)
-                    }
-                )
-
-        },
-        fetchUserProfile ({commit, getters}) {
-            commit('setLoading', true)
-            firebase.database().ref('/profiles/' + getters.user.id).once
-            ('value')
-                .then (data => {
-                    const obj = data.val()
-                    let userprofile = obj
-
-                    // console.log("fetch user profile email")
-                    // console.log(getters.user.email)
-                    commit('setProfile', userprofile)
-                    // console.log("profile set")
-                    // console.log(getters.user.profile)
-
-                    commit('setLoading', false)
-
-
-                    // console.log("User prof taken from db")
-                    // console.log(getters.user)
-                })
-                .catch(
-                    error => {
-                        commit('setLoading', false)
-                        console.log(error)
-                    }
-                )
-
-        },        
-        fetchUserType ({commit, getters}) {
-            commit('setLoading', true)
-            firebase.database().ref('/userType/' + getters.user.id).once
-            ('value')
-                .then (data => {
-                    const obj = data.val()
-                    let type = obj
-
-                    commit('setUserType', type)
-
-                    console.log("user type set")
-                    console.log(getters.user.type)
-
-                    commit('setLoading', false)
-                })
-                .catch(
-                    error => {
-                        commit('setLoading', false)
-                        console.log(error)
                     }
                 )
 
