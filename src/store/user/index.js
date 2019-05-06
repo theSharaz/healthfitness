@@ -79,8 +79,8 @@ export default {
                         ...newUser
                     }
 
-                    console.log('User')
-                    console.log(getters.user)
+                    // console.log('User')
+                    // console.log(getters.user)
     
                 }
             )
@@ -102,26 +102,26 @@ export default {
                 // console.log('payload Type')
                 // console.log(payload.type)
                 // console.log('User Type')
-                // console.log(getters.user.type)
+                // console.log(theNoob.type)
 
 
             })
             .then(() => {
 
                 const user = getters.user
-                console.log('PAYLOAD Type')
-                console.log(payload.type)
+                // console.log('PAYLOAD Type')
+                // console.log(payload.type)
                 if(payload.type === 'normal' || 'NORMAL') {
+
+                    theNoob = {
+                        ...theNoob,
+                        membership: 'none'
+                    }
+
                     return firebase.database().ref('membership').child(user.id).update({status: 'none'})
                 }
             })
             .then(() => {
-
-
-                theNoob = {
-                    ...theNoob,
-                    membership: none
-                }
 
                 commit('setUser', theNoob)
                 console.log('the Noob is SET')
@@ -188,6 +188,10 @@ export default {
 
         },
         fetchUserData ({commit, getters}) {
+
+            // console.log("USER ID BEFORE DATA FETCH")
+            // console.log(getters.user.id)
+
             commit('setLoading', true)
             let LeUser = null
             firebase.database().ref('/users/' + getters.user.id + '/registrations').once
@@ -212,8 +216,9 @@ export default {
 
                 })
                 .then(() => {
-                    console.log("user id after data")
-                    console.log(getters.user.id)
+                    // console.log("user id after data")
+                    // console.log(getters.user.id)
+
                     firebase.database().ref('/profiles/' + getters.user.id).once
                     ('value')
                         .then (data => {
@@ -225,8 +230,8 @@ export default {
                                 profile: userprofile
                             }
                            
-                            console.log("LeUser after profile added")
-                            console.log(LeUser)
+                            // console.log("LeUser after profile added")
+                            // console.log(LeUser)
         
                         })
                 })
@@ -239,39 +244,43 @@ export default {
         
                             LeUser = {
                                 ...LeUser,
-                                type: type
+                                type: type.type
                             }
+
+                            // console.log('FULL USER SET AFTER USER TYPE')
+                            commit('setUser', LeUser)
+                            // console.log(getters.user)
         
                         })  
 
                 })
-                // .then(() => {
-                //     if(LeUser.type === 'normal' || 'NORMAL') {
-
-                //         console.log('NORMAL USER MEMBERSHIP STATUS')
-
-
-                //         firebase.database().ref('/membership/' + getters.user.id).once
-                //         ('value')
-                //             .then (data => {
-                //                 const obj = data.val()
-                //                 let membership = obj
-            
-                //                 LeUser = {
-                //                     ...LeUser,
-                //                     membership: membership.membership
-                //                 }
-                //             })  
-                //     }
-
-                // })
                 .then(() => {
-                    console.log('USER SET')
-                    commit('setUser', LeUser)
-                    console.log(getters.user)
+                    if(LeUser.type === 'normal' || 'NORMAL') {
+
+                        // console.log('NORMAL USER MEMBERSHIP STATUS')
+
+
+                        firebase.database().ref('/membership/' + getters.user.id).once
+                        ('value')
+                            .then (data => {
+                                const obj = data.val()
+                                let membership = obj
+            
+                                LeUser = {
+                                    ...LeUser,
+                                    membership: membership.status
+                                }
+
+                                // console.log('FULL USER SET')
+                                commit('setUser', LeUser)
+                                // console.log(getters.user)
+
+                            })  
+                    }
+
+
                     commit('setLoading', false)
 
-    
                 })
                 .catch(
                     error => {
@@ -283,7 +292,6 @@ export default {
         },
         createProfile ({commit, getters}, payload) {
             commit('setLoading', true)
-
             const user = getters.user
 
             // console.log("Create user email from getter")
@@ -334,6 +342,30 @@ export default {
                 console.log(error)
             })
             
+        },
+        payForMembership({commit, getters}) {
+            commit('setLoading', true)
+            const user = getters.user
+
+            firebase.database().ref('membership').child(user.id).update({status: 'paid'})
+            .then(() => {
+
+                payingMember = {
+                    ...user,
+                    membership: 'paid'
+
+                }
+                commit('setUser', payingMember)
+                commit('setLoading', false)
+
+                console.log('membership set')
+                console.log(getters.user.membership)
+                // console.log('User Type')
+                // console.log(theNoob.type)
+
+
+            })
+
         },
         updateProfile ({commit, getters}, payload) {
             commit('setLoading', true)

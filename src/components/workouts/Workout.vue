@@ -50,10 +50,14 @@
             </div>       
           </v-card-text>
           <v-card-actions>
-          <v-spacer></v-spacer>
+            <v-spacer></v-spacer>
+
+            <app-membership-dialog
+            v-if="userIsAuthenticated && !userIsCreator && !userIsMember">
+            </app-membership-dialog>
             <app-workout-register-dialog 
             :workoutId="workout.id" 
-            v-if="userIsAuthenticated && !userIsCreator">
+            v-if="userIsAuthenticated && !userIsCreator && userIsMember">
             </app-workout-register-dialog>
           </v-card-actions>
 
@@ -84,6 +88,11 @@ import 'es6-promise/auto';
           return false
         }
         return this.$store.getters.user.id == this.workout.creatorId
+      },
+      userIsMember () {
+        console.log('membership status')
+        console.log(this.$store.getters.user.membership)
+        return this.$store.getters.user.membership === 'paid'
       },
       loading () {
         return this.$store.getters.loading

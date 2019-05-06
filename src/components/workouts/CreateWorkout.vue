@@ -97,6 +97,7 @@
   <v-layout row>
     <v-flex xs12 sm6 offset-sm3>
       <v-btn 
+      v-if="userIsAuthenticated && !this.userIsNormal"
       class="primary" 
       :disabled="!formIsValid"
       @click="onCreateWorkout"
@@ -140,6 +141,12 @@
         const date = new Date(this.date)
         date.setHours(this.time.substr(0, 2),this.time.substr(3, 5))
         return date
+      },
+      userIsAuthenticated () {
+        return this.$store.getters.user !== null && this.$store.getters.user !== undefined
+      },
+      userIsNormal () {
+        return this.$store.getters.user.type === 'normal' || this.$store.getters.user.type === 'NORMAL'
       }
     },
     

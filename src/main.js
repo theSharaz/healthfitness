@@ -14,6 +14,7 @@ import EditWorkoutTimeDialog from './components/workouts/Edit/EditWorkoutTimeDia
 import RegisterDialog from './components/workouts/Registration/RegisterDialog.vue'
 import CreateProfileDialog from './components/user/prof/CreateProfileDialog.vue'
 import EditProfileDialog from './components/user/prof/EditProfileDialog.vue'
+import MembershipDialog from './components/user/membership/MembershipDialog.vue'
 
 
 Vue.use(Vuetify, {
@@ -38,6 +39,7 @@ Vue.component('app-edit-workout-time-dialog', EditWorkoutTimeDialog)
 Vue.component('app-workout-register-dialog', RegisterDialog)
 Vue.component('app-create-profile-dialog', CreateProfileDialog)
 Vue.component('app-edit-profile-dialog', EditProfileDialog)
+Vue.component('app-membership-dialog', MembershipDialog)
 
 
 new Vue({

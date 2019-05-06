@@ -105,8 +105,7 @@ export default {
       ]
 
       if(this.userIsAuthenticated && this.userIsNormal) {
-              console.log("Normal menu activated")
-
+              // console.log("Normal menu activated")
         menuItems = [
             {icon: 'fitness_center', title: 'Group Workouts', link: '/gw'},
             {icon: 'accessibility_new', title: 'My Workouts', link: '/myw'},
@@ -114,7 +113,7 @@ export default {
         ]
       }
       else if (this.userIsAuthenticated && !this.userIsNormal) {
-                      console.log("Trainer menu activated")
+                      // console.log("Trainer menu activated")
         menuItems = [
             {icon: 'fitness_center', title: 'Group Workouts', link: '/gw'},
             {icon: 'visibility_off', title: 'Private Workouts', link: '/pvtw'},
@@ -129,8 +128,9 @@ export default {
       return this.$store.getters.user !== null && this.$store.getters.user !== undefined
     },
     userIsNormal () {
-      console.log("check normal user FROM APP.vue")
-      console.log(this.$store.getters.user)
+      // console.log("check normal user FROM APP.vue")
+      // console.log(this.$store.getters.user)
+
       return this.$store.getters.user.type === 'normal' || this.$store.getters.user.type === 'NORMAL'
     }
   },
@@ -139,12 +139,13 @@ export default {
       this.$store.dispatch('logout')
       this.$router.push('/')
     }
-  },
-  created () {
-    this.userIsNormal
-    this.menuItems
-
   }
+  // ,
+  // created () {
+  //   this.userIsNormal
+  //   this.menuItems
+
+  // }
 
 }
 </script>
