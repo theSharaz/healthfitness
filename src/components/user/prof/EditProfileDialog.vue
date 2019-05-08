@@ -39,7 +39,7 @@
                         v-model="editedHeight"
                         name="height"
                         maxlength="3"
-                        :rules="[rules.number, rules.length(1)]"
+                        :rules="[rules.number]"
                         label="Height"
                         class="form-control"
                         required>
@@ -52,7 +52,7 @@
                         name="weight"
                         maxlength="3"
                         label="Weight"
-                        :rules="[rules.number, rules.length(1)]"
+                        :rules="[rules.number]"
                         required>
                         </v-text-field>
                     </v-flex>
@@ -136,9 +136,13 @@
     methods: {
       onSaveChanges () {
 
-          if (!this.image) {
-            return 
-          }             
+            if (this.editedName.trim() === '' ||  
+                this.editedPhone.trim() === '' ||  
+                this.editedImageUrl.trim() === '' ||  
+                this.editedWeight.trim() === '' ||  
+                this.editedHeight.trim() === '') {
+                return
+            }          
           this.profEditDialog = false
 
         const profileData = {
@@ -150,6 +154,8 @@
         }
         this.$store.dispatch('updateProfile', profileData)
         this.$router.push('/prof')
+        this.$store.dispatch('fetchUserData')
+
       },
       onPickFile() {
         this.$refs.fileInput.click()

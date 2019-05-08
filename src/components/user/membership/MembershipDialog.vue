@@ -76,6 +76,8 @@ export default {
                 if(this.code == '123456789'){
                     this.$store.dispatch('payForMembership')
                 }
+                    this.$store.dispatch('fetchUserData')
+
             }
         },
       onDismissed () {

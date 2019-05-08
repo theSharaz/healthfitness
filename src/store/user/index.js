@@ -4,9 +4,17 @@ import * as firebase from 'firebase'
 
 export default {
     state: {
-        user: null
+        user: null,
+        loadedTrainers: []
     },
     mutations: {
+        setLoadedTrainers (state, payload) {
+            state.loadedTrainers = payload
+        },
+        // registerPrivateWorkout (state, payload) {
+        //     state.user.registeredWorkouts.push(id)
+        //     state.user.fbKeys[id] = payload.fbKey
+        // },
         registerUserForWorkout (state, payload) {
             const id = payload.id
             //security to make sure no double registrations
@@ -27,6 +35,98 @@ export default {
         }
     },
     actions: {
+        loadTrainers({commit}) {
+            commit('setLoading', true)
+            let trainers = []
+            let trainerProfiles = []
+
+            firebase.database().ref('userType').once('value')
+            .then((data) => { 
+                const obj = data.val()
+                for (let key in obj) {
+                    if (obj[key].type === 'trainer') {
+                        trainers.push({
+                            id: key
+                        })
+                    }
+                }
+
+                // console.log('trainer user type')
+                // console.log(trainers)
+
+            })
+            .then(() => {
+                // console.log("user id after data")
+                // console.log(getters.user.id)
+                firebase.database().ref('profiles').once('value')
+                .then (data => {
+                    const obj = data.val()
+                    let userprofiles = []
+
+                    for (let key in obj) {
+                        userprofiles.push({
+                            ...obj[key],
+                            id: key
+                        })
+                        // console.log('TRAINER KEYS')
+                        // console.log(key)
+                    }
+
+                    for (let key in userprofiles) {
+                        // console.log('userprofiles key')
+                        // console.log(userprofiles[key])
+                        for (let key1 in trainers) {
+                            // console.log('trainer key')
+                            // console.log(trainers[key1])
+                            if (userprofiles[key].id === trainers[key1].id) {
+                                trainerProfiles.push(userprofiles[key])
+                            }
+
+                        }
+
+                    }
+                    // console.log('user profiles')
+                    // console.log(userprofiles)
+                    // console.log('trainer profiles')
+                    // console.log(trainerProfiles)
+                    
+                    commit('setLoadedTrainers', trainerProfiles)
+                    commit('setLoading', false)
+
+                    // console.log('TRAINER PROFILES SET')
+                    // console.log(getters.loadedTrainers)
+
+                })
+
+            })
+            .catch(
+                (error) => {
+                console.log(error)
+                commit('setLoading', false)
+                }
+            )
+        },
+        registerPrivateWorkout ({commit,getters}, payload) {
+            commit('setLoading', true)
+            const user = getters.user
+            firebase.database().ref('/users/' + user.id).child('/privateWorkouts/')
+            .update({trainer: payload.trainerid,
+                    date: payload.date})
+                .then(() => {
+                    firebase.database().ref('/users/' + payload.trainerid).child('/privateWorkouts/')
+                    .update({client: user.id,
+                        date: payload.date})
+                    .then(() => {
+                        // commit('setLoading', false)
+                        // commit('registerUserForWorkout', {id: payload, fbKey: data.key})
+
+                    })
+                })
+                .catch(error => {
+                    console.log(error)
+                    commit('setLoading', false)
+                })
+        },
         registerUserForWorkout ({commit,getters}, payload) {
             commit('setLoading', true)
             const user = getters.user
@@ -293,6 +393,7 @@ export default {
         createProfile ({commit, getters}, payload) {
             commit('setLoading', true)
             const user = getters.user
+            let LeUser = null
 
             // console.log("Create user email from getter")
             // console.log(getters.user.email)
@@ -328,11 +429,16 @@ export default {
             .then(() => {
 
                 profile.imageUrl = imageUrl
+                LeUser = {
+                    ...user,
+                    profile: profile
+                }
+
                 commit('setLoading', false)
-                commit('setProfile', profile)
+                commit('setUser', LeUser)
 
                 console.log('created profile')
-                console.log(getters.user.profile)
+                console.log(getters.user)
 
 
             })
@@ -358,8 +464,8 @@ export default {
                 commit('setUser', payingMember)
                 commit('setLoading', false)
 
-                console.log('membership set')
-                console.log(getters.user.membership)
+                // console.log('membership set')
+                // console.log(getters.user.membership)
                 // console.log('User Type')
                 // console.log(theNoob.type)
 
@@ -370,6 +476,7 @@ export default {
         updateProfile ({commit, getters}, payload) {
             commit('setLoading', true)
             const user = getters.user
+            let LeUser = null
 
             // console.log("Create user email from getter")
             // console.log(getters.user.email)
@@ -422,21 +529,16 @@ export default {
             })
             .then(() => {
                 profile.imageUrl = imageUrl
-         
-                // profile.imageUrl = imageUrl
-                // const updatedUser = {
-                //     id: getters.user.id,
-                //     email: getters.user.email,
-                //     registeredWorkouts: getters.user.registeredWorkouts,
-                //     fbKeys: getters.user.fbKeys,
-                //     profile: profile
-                // }
-                // commit('setUser', updatedUser)
-                commit('setLoading', false)
-                commit('setProfile', profile)
+                LeUser = {
+                    ...user,
+                    profile: profile
+                }
 
-                console.log('create profile email here')
-                console.log(getters.user.profile)
+                commit('setLoading', false)
+                commit('setUser', LeUser)
+
+                console.log('profile updated')
+                console.log(getters.user)
 
 
             })
@@ -454,6 +556,17 @@ export default {
     getters: {
         user (state) {
             return state.user
+        }, 
+        loadedTrainers (state) {
+            return state.loadedTrainers
+        },
+        loadedTrainer (state) {
+            return (trainerid) => {
+                return state.loadedTrainers.find((trainer) =>{
+                    return trainer.id === trainerid
+                })
+            }
         }
+
     }
 }

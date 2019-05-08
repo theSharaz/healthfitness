@@ -166,6 +166,8 @@
           height: this.height
         }
         this.$store.dispatch('createProfile', profileData)
+        this.$store.dispatch('fetchUserData')
+
         // this.$router.push('/prof')
       },
       onPickFile() {

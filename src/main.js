@@ -12,6 +12,7 @@ import EditWorkoutDetailsDialog from './components/workouts/Edit/EditWorkoutDeta
 import EditWorkoutDateDialog from './components/workouts/Edit/EditWorkoutDateDialog.vue'
 import EditWorkoutTimeDialog from './components/workouts/Edit/EditWorkoutTimeDialog.vue'
 import RegisterDialog from './components/workouts/Registration/RegisterDialog.vue'
+import BookWorkoutDialog from './components/workouts/Registration/BookWorkoutDialog.vue'
 import CreateProfileDialog from './components/user/prof/CreateProfileDialog.vue'
 import EditProfileDialog from './components/user/prof/EditProfileDialog.vue'
 import MembershipDialog from './components/user/membership/MembershipDialog.vue'
@@ -19,9 +20,9 @@ import MembershipDialog from './components/user/membership/MembershipDialog.vue'
 
 Vue.use(Vuetify, {
   theme: {
-    primary: colors.red.darken1, // #E53935
-    secondary: colors.red.accent2,
-    accent: colors.grey.lighten1,
+    primary: colors.blueGrey.darken2, // #E53935
+    secondary: colors.blue.accent2,
+    accent: colors.red.lighten1,
     error: colors.amber.darken2,
     info: colors.blue.lighten1,
     warning: colors.red.accent4,
@@ -40,6 +41,7 @@ Vue.component('app-workout-register-dialog', RegisterDialog)
 Vue.component('app-create-profile-dialog', CreateProfileDialog)
 Vue.component('app-edit-profile-dialog', EditProfileDialog)
 Vue.component('app-membership-dialog', MembershipDialog)
+Vue.component('app-book-workout-dialog', BookWorkoutDialog)
 
 
 new Vue({
@@ -63,6 +65,8 @@ new Vue({
       }
      })
      this.$store.dispatch('loadWorkouts')
+     this.$store.dispatch('loadTrainers')
+
   },
   render: h => h(App)
 }).$mount('#app')
