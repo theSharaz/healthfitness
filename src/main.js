@@ -66,6 +66,7 @@ new Vue({
      })
      this.$store.dispatch('loadWorkouts')
      this.$store.dispatch('loadTrainers')
+     this.$store.dispatch('loadProfiles')
 
   },
   render: h => h(App)

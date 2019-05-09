@@ -1,6 +1,17 @@
 <template>
   <v-container>
 
+        <v-layout row wrap v-if="loading">
+      <v-flex xs12 class="text-xs-center">
+          <v-progress-linear 
+          :indeterminate="true"
+
+          class="info"
+          >
+          </v-progress-linear>
+      </v-flex>
+    </v-layout>
+
     <v-layout align-center justify-center row  v-if="!loading || !profileIsAvailable || userIsMember">
       <v-flex xs12>
         <v-card>
@@ -26,6 +37,54 @@
 
       </v-flex>
     </v-layout>
+
+
+
+    <v-layout row wrap 
+    class="mb-2"
+    v-if="pvtWorkoutIsAvailable && !loading && !userIsMember">
+      <v-flex xs12 sm10 md8 offset-sm1 offset-md2>
+
+        <v-card class="primary">
+          <v-container fluid>
+            <v-layout row>
+              <v-flex xs5 sm4 md3>
+                
+                <v-img
+                v-if="pvtWorkoutIsAvailable"
+                  :src="trainerProfile.imageUrl"
+                  height="230px"
+                  contain>
+                </v-img>
+
+              </v-flex>
+              <v-flex xs7 sm8 md9>
+                
+                <v-card-title primary-title>
+                    <h2 class="">Private workout booked for the {{privateWorkout.date | date}}</h2>
+                    <v-spacer></v-spacer>
+                    <v-btn flat color="secondary" @click="onUnRegisterPvtWorkout"><v-icon>cancel</v-icon></v-btn>
+                </v-card-title>
+
+
+                <v-card-text>
+                  <div>
+                    <h4 class="mb-0">{{trainerProfile.name}}</h4>
+                    <h4 class="mb-0">{{privateWorkout.trainer}}</h4>
+                  </div>
+                </v-card-text>
+
+
+              </v-flex>
+            </v-layout>
+          </v-container>
+
+        </v-card>
+
+      </v-flex>
+    </v-layout>
+
+  <v-divider></v-divider>
 
     <v-layout row wrap 
     v-for="trainer in trainerProfiles" 
@@ -56,8 +115,15 @@
 
                 <v-card-actions>
                 <app-book-workout-dialog
-                :trainerid="trainer.id"></app-book-workout-dialog>
+                :trainerid="trainer.id"
+                v-if="!pvtWorkoutIsAvailable"
+                ></app-book-workout-dialog>
                 </v-card-actions>
+                  <v-card-text>
+                  <div>
+            {{ pvtWorkoutIsAvailable ? 'First remove booked lesson to Book a workout' : '' }}
+                  </div>
+                </v-card-text>
 
               </v-flex>
             </v-layout>
@@ -84,12 +150,34 @@
             // console.log(this.$store.getters.loadedTrainers)
         return this.$store.getters.loadedTrainers
       },
+      trainerProfile () {
+        
+            // console.log('Loaded trainers')
+            // console.log(this.$store.getters.loadedTrainers)
+        return this.$store.getters.loadedTrainer(this.privateWorkout.trainer)        
+      },
+      privateWorkout () {
+        
+            // console.log('Loaded trainers')
+            // console.log(this.$store.getters.loadedTrainers)
+        return this.$store.getters.user.privateWorkouts
+      },
       hasProfile () {
-        console.log(this.profile)
+            // console.log('my workouts.vue')
+            // console.log(this.$store.getters.user)
         return this.$store.getters.user.profile !== null &&  this.$store.getters.user.profile !== undefined
       },
       profileIsAvailable () {
         if (!this.hasProfile) {
+          return false
+        }
+        return true
+      },
+      hasPrivateWorkout () {
+        return this.$store.getters.user.privateWorkouts !== null &&  this.$store.getters.user.privateWorkouts !== undefined
+      },
+      pvtWorkoutIsAvailable () {
+        if (!this.hasPrivateWorkout) {
           return false
         }
         return true
@@ -103,6 +191,13 @@
          return this.$store.getters.user !== null &&  this.$store.getters.user !== undefined
       }
 
+    },
+    methods: {
+        onUnRegisterPvtWorkout () {
+            if (this.pvtWorkoutIsAvailable) {
+                this.$store.dispatch('unRegisterPrivateWorkout', this.privateWorkout.trainer)
+            } 
+        }
     }
 
   }

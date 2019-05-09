@@ -5,16 +5,27 @@ import * as firebase from 'firebase'
 export default {
     state: {
         user: null,
-        loadedTrainers: []
+        loadedTrainers: [],
+        loadedProfiles: []
     },
     mutations: {
         setLoadedTrainers (state, payload) {
             state.loadedTrainers = payload
         },
-        // registerPrivateWorkout (state, payload) {
-        //     state.user.registeredWorkouts.push(id)
-        //     state.user.fbKeys[id] = payload.fbKey
-        // },
+        setLoadedProfiles (state, payload) {
+            state.loadedProfiles = payload
+        },
+        registerPrivateWorkout (state, payload) {
+            state.user.privateWorkouts.push(payload)
+        },
+        unRegisterPrivateWorkout (state, payload) {
+            // const regPvtWorkout = state.user.privateWorkouts
+            // registeredWorkouts.splice(registeredWorkouts.findIndex(workout => workout.id === 
+            //     payload), 1)
+            // Reflect.deleteProperty(state.user.fbKeys, payload)
+
+            state.user.privateWorkouts = null
+        },
         registerUserForWorkout (state, payload) {
             const id = payload.id
             //security to make sure no double registrations
@@ -35,6 +46,28 @@ export default {
         }
     },
     actions: {
+        loadProfiles({commit}) {
+            commit('setLoading', true)
+            firebase.database().ref('profiles').once('value')
+            .then((data) => {
+                const profiles = []
+                const obj = data.val()
+                for (let key in obj) {
+                    profiles.push({
+                        ...obj[key],
+                            id: key
+                    })
+                }
+                commit('setLoadedProfiles', profiles)
+                commit('setLoading', false)
+            })
+            .catch(
+                (error) => {
+                console.log(error)
+                commit('setLoading', false)
+                }
+            )
+        },
         loadTrainers({commit}) {
             commit('setLoading', true)
             let trainers = []
@@ -117,9 +150,38 @@ export default {
                     .update({client: user.id,
                         date: payload.date})
                     .then(() => {
-                        // commit('setLoading', false)
-                        // commit('registerUserForWorkout', {id: payload, fbKey: data.key})
+                        commit('setLoading', false)
+                        commit('registerPrivateWorkout', {trainerid: payload.trainerid, date: payload.date})
 
+                    })
+                })
+                .catch(error => {
+                    console.log(error)
+                    commit('setLoading', false)
+                })
+        },
+        unRegisterPrivateWorkout ({commit,getters}, payload) {
+            commit('setLoading', true)
+            const user = getters.user
+            if (!user.privateWorkouts) {
+                return
+            }
+            const privateWorkouts = user.privateWorkouts[payload]
+            firebase.database().ref('/users/' + user.id + '/privateWorkouts')
+                .remove()
+                .then(() => {
+   
+                })
+                .then(() => {
+                    firebase.database().ref('/users/' + payload  +  '/privateWorkouts/')
+                    .remove()
+                    .then(() => {
+                        commit('setLoading', false)
+                        commit('unRegisterPrivateWorkout')
+                        // console.log('Trainer id being deleted')
+                        // console.log(payload)
+                        // console.log('USER AFTER PRIVATE WORKOUT DELETED')
+                        // console.log(getters.user)
                     })
                 })
                 .catch(error => {
@@ -355,6 +417,28 @@ export default {
 
                 })
                 .then(() => {
+                    firebase.database().ref('/users/' + getters.user.id + '/privateWorkouts').once
+                        ('value')
+                        .then (data => {
+                            const obj = data.val()
+                            let pvtworkouts = {
+                                ...obj,
+                                privateWorkouts: pvtworkouts
+                            }
+        
+                            LeUser = {
+                                ...LeUser,
+                                privateWorkouts: pvtworkouts
+                            }
+
+                            console.log('PVT Workouts SET')
+                            commit('setUser', LeUser)
+                            console.log(getters.user)
+        
+                        })
+
+                })
+                .then(() => {
                     if(LeUser.type === 'normal' || 'NORMAL') {
 
                         // console.log('NORMAL USER MEMBERSHIP STATUS')
@@ -566,7 +650,18 @@ export default {
                     return trainer.id === trainerid
                 })
             }
+        },
+        loadedProfiles (state) {
+            return state.loadedProfiles
+        },
+        loadedProfile (state) {
+            return (profileid) => {
+                return state.loadedProfiles.find((profile) =>{
+                    return profile.id === profileid
+                })
+            }
         }
+
 
     }
 }

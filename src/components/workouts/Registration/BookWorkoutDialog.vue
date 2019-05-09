@@ -112,6 +112,8 @@ export default {
                 trainerid: this.trainerid,
                 date: newDate
             })
+            this.$store.dispatch('fetchUserData')
+
 
         }
     },
