@@ -6,11 +6,15 @@ export default {
     state: {
         user: null,
         loadedTrainers: [],
+        loadedClients:  [],
         loadedProfiles: []
     },
     mutations: {
         setLoadedTrainers (state, payload) {
             state.loadedTrainers = payload
+        },
+        setLoadedClients (state, payload) {
+            state.loadedClients = payload
         },
         setLoadedProfiles (state, payload) {
             state.loadedProfiles = payload
@@ -68,10 +72,12 @@ export default {
                 }
             )
         },
-        loadTrainers({commit}) {
+        loadTrainersAndClients({commit}) {
             commit('setLoading', true)
             let trainers = []
+            let clients = []
             let trainerProfiles = []
+            let clientProfiles = []
 
             firebase.database().ref('userType').once('value')
             .then((data) => { 
@@ -79,6 +85,14 @@ export default {
                 for (let key in obj) {
                     if (obj[key].type === 'trainer') {
                         trainers.push({
+                            id: key
+                        })
+                    }
+                }
+
+                for (let key in obj) {
+                    if (obj[key].type === 'normal') {
+                        clients.push({
                             id: key
                         })
                     }
@@ -116,6 +130,14 @@ export default {
                             }
 
                         }
+                        for (let key2 in clients) {
+                            // console.log('client key')
+                            // console.log(clients[key2])
+                            if (userprofiles[key].id === clients[key2].id) {
+                                clientProfiles.push(userprofiles[key])
+                            }
+
+                        }
 
                     }
                     // console.log('user profiles')
@@ -124,6 +146,7 @@ export default {
                     // console.log(trainerProfiles)
                     
                     commit('setLoadedTrainers', trainerProfiles)
+                    commit('setLoadedClients', clientProfiles)
                     commit('setLoading', false)
 
                     // console.log('TRAINER PROFILES SET')
@@ -648,6 +671,16 @@ export default {
             return (trainerid) => {
                 return state.loadedTrainers.find((trainer) =>{
                     return trainer.id === trainerid
+                })
+            }
+        },
+        loadedClients (state) {
+            return state.loadedClients
+        },
+        loadedClient (state) {
+            return (clientid) => {
+                return state.loadedClients.find((client) =>{
+                    return client.id === clientid
                 })
             }
         },

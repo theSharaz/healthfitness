@@ -65,7 +65,7 @@ new Vue({
       }
      })
      this.$store.dispatch('loadWorkouts')
-     this.$store.dispatch('loadTrainers')
+     this.$store.dispatch('loadTrainersAndClients')
      this.$store.dispatch('loadProfiles')
 
   },

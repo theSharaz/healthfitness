@@ -42,7 +42,7 @@
 
     <v-layout row wrap 
     class="mb-2"
-    v-if="pvtWorkoutIsAvailable && !loading && !userIsMember">
+    v-if="pvtWorkoutIsAvailable && !loading && !userIsMember && trainerProfile">
       <v-flex xs12 sm10 md8 offset-sm1 offset-md2>
 
         <v-card class="primary">
@@ -121,16 +121,55 @@
                 </v-card-actions>
                   <v-card-text>
                   <div>
-            {{ pvtWorkoutIsAvailable ? 'First remove booked lesson to Book a workout' : '' }}
+            {{ pvtWorkoutIsAvailable ? 'First remove booked lesson to Book a workout' : 'lala' }}
                   </div>
                 </v-card-text>
 
               </v-flex>
             </v-layout>
           </v-container>
-
         </v-card>
+      </v-flex>
+    </v-layout>
 
+        <v-layout align-center justify-center row wrap  
+          class="mb-2"
+          v-if="profileIsAvailable && !loading && !userIsMember && registeredWorkouts">
+            <v-flex xs12 sm10 md8 offset-sm5 offset-md2>
+              <h2 align-center justify-center>Registered Workouts</h2>
+            </v-flex>
+    </v-layout>     
+
+        <v-layout row wrap 
+    v-for="workout in registeredWorkouts" 
+    :key="workout.id" 
+    class="mb-2"
+    v-if="profileIsAvailable && !loading && !userIsMember && registeredWorkouts">
+      <v-flex xs12 sm10 md8 offset-sm1 offset-md2>
+
+        <v-card class="info">
+          <v-container fluid>
+            <v-layout row>
+
+            <v-flex xs5 sm4 md3>
+              <v-img
+                :src="workout.imageUrl"
+                height="130px"
+                contain>
+                </v-img>
+            </v-flex>
+            <v-flex xs7 sm8 md9>
+              <v-card-title primary-title>
+                <div>
+                  <h4 class="mb-0">{{workout.title}}</h4>
+                  <div>{{workout.date | date}}</div>
+                </div>
+              </v-card-title>
+            </v-flex>
+
+            </v-layout>
+          </v-container>
+        </v-card>
       </v-flex>
     </v-layout>
 
@@ -149,6 +188,22 @@
             // console.log('Loaded trainers')
             // console.log(this.$store.getters.loadedTrainers)
         return this.$store.getters.loadedTrainers
+      },
+      registeredWorkouts () {
+            // console.log('Loaded trainers')
+            // console.log(this.$store.getters.loadedTrainers)
+        const work = this.$store.getters.user.registeredWorkouts
+        console.log("const work structure")
+        console.log(work)
+        const regWork = []
+        for(let key in work){
+            regWork.push(this.$store.getters.loadedWorkout(work[key]))
+        }
+
+        console.log("user REGISTERED PUB WORKOUTS")
+        console.log(regWork)
+        return regWork
+
       },
       trainerProfile () {
         
