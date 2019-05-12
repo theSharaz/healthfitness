@@ -13,7 +13,7 @@
     </v-layout>
 
             <v-layout align-center justify-center row  v-if="!loading || !profileIsAvailable">
-            <v-flex xs12>
+            <v-flex xs12 sm10 md8 offset-sm0 align-center justify-center>
                 <v-card>
 
                 <v-card-title v-if="userIsAuthenticated && !profileIsAvailable">
@@ -25,15 +25,11 @@
                     </template>
                 </v-card-title>
 
-                <v-card-title align-center justify-center mt-5 block v-if="userIsAuthenticated && !pvtWorkoutIsAvailable">
+                <v-card-title offset-ml2 align-center justify-center mt-5 block v-if="userIsAuthenticated && !pvtWorkoutIsAvailable">
                     <template>
-                    
-                        <div>
-                            <h1>
-                            {{ pvtWorkoutIsAvailable ? '' : 'No client has booked a private lesson with you' }}
-                            </h1>
-                        </div>
-
+                      <h1 offset-ml2>
+                      {{ pvtWorkoutIsAvailable ? '' : 'No client has booked a private lesson with you' }}
+                      </h1>
                     </template>
                 </v-card-title>
 

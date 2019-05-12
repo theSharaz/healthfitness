@@ -6,8 +6,8 @@
     width="800px"
     transition="dialog-transition">
 
-    <v-btn color="secondary" dark slot="activator" >
-        <v-icon left dark>edit</v-icon> Book Workout Workout
+    <v-btn width="10px" xs1 sm1 color="primary" light slot="activator" >
+        <v-icon left >edit</v-icon> Book Workout Workout
     </v-btn>
 
     <v-card>

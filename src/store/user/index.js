@@ -445,13 +445,20 @@ export default {
                         .then (data => {
                             const obj = data.val()
                             let pvtworkouts = {
-                                ...obj,
-                                privateWorkouts: pvtworkouts
+                                ...obj
                             }
-        
-                            LeUser = {
-                                ...LeUser,
-                                privateWorkouts: pvtworkouts
+                            
+                            if(pvtworkouts.date != null){
+                                console.log("shit aint working")
+                                LeUser = {
+                                    ...LeUser,
+                                    privateWorkouts: pvtworkouts
+                                }
+                            } else {
+                                LeUser = {
+                                    ...LeUser,
+                                    privateWorkouts: null
+                                }
                             }
 
                             console.log('PVT Workouts SET')
