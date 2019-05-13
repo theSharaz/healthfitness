@@ -38,17 +38,26 @@
       </v-flex>
     </v-layout>
 
+    <v-layout row wrap 
+    class="mb-2"
+    v-if="pvtWorkoutIsAvailable && !loading && !userIsMember && trainerProfile">
+      <v-flex xs12 offset-sm5  offset-ml2>
 
+        <h2 align-center justify-center>Private Booking</h2>
+
+
+      </v-flex>
+    </v-layout>
 
     <v-layout row wrap 
     class="mb-2"
     v-if="pvtWorkoutIsAvailable && !loading && !userIsMember && trainerProfile">
-      <v-flex xs12 sm10 md8 offset-sm1 offset-md2>
+      <v-flex xs12 offset-sm1 offset-md2>
 
         <v-card class="primary">
           <v-container fluid>
             <v-layout row>
-              <v-flex xs5 sm4 md3>
+              <v-flex xs12>
                 
                 <v-img
                 v-if="pvtWorkoutIsAvailable"
@@ -57,20 +66,22 @@
                   contain>
                 </v-img>
 
+                <v-divider></v-divider>
+
+                <v-card-text>
+                  <h2 class="mb-0">Coach: {{trainerProfile.name}}</h2>
+                </v-card-text>
+
               </v-flex>
               <v-flex xs7 sm8 md9>
                 
                 <v-card-title primary-title>
-                    <h2 class="">Private workout booked for the {{privateWorkout.date | date}}</h2>
+                    <h2 class="">Booking: {{privateWorkout.date | date}}</h2>
                 </v-card-title>
 
 
 
-                <v-card-text>
-                  <div>
-                    <h4 class="mb-0">{{trainerProfile.name}}</h4>
-                  </div>
-                </v-card-text>
+
               </v-flex>
 
               <v-flex xs1 sm1 md1>
@@ -129,20 +140,15 @@
                 </v-card-title>
 
                 <v-card-actions>
-                <div
-                width="10px">
                   <app-book-workout-dialog
                   :trainerid="trainer.id"
                   v-if="!pvtWorkoutIsAvailable"
                   ></app-book-workout-dialog>
-                </div>
-
-
                 </v-card-actions>
+
+
                   <v-card-text>
-                  <div>
             {{ pvtWorkoutIsAvailable ? 'First remove booked lesson to Book a workout' : '' }}
-                  </div>
                 </v-card-text>
 
               </v-flex>

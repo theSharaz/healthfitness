@@ -6,25 +6,27 @@
     width="800px"
     transition="dialog-transition">
 
-    <v-btn width="10px" xs1 sm1 color="primary" light slot="activator" >
-        <v-icon left >edit</v-icon> Book Workout Workout
+
+    <v-btn xs5 sm4 :style="{ width: myWidth + 'px' }"  width="100px" color="primary" light slot="activator" >
+        <v-icon  >edit</v-icon> Book Workout
     </v-btn>
+
+
 
     <v-card>
         <v-container>
 
-            <v-layout row wrap>
-                <v-flex xs12>
-                    <v-card-title>Book Workout with {{trainer.id}}</v-card-title>
+            <v-layout row wrap xs12>
+                <v-flex xs12 offset-sm1>
+                    <v-card-title><h3>Book Workout with {{trainer.name}}</h3></v-card-title>
                 </v-flex>
             </v-layout>
 
             <v-divider></v-divider>
 
-            <v-layout row>
+            <v-layout row wrap xs6>
                 <v-flex
-                    grow
-                    pa-1>
+                    xs12>
                     <v-card
                     dark
                     color="green darken-3">
@@ -39,10 +41,13 @@
                     </v-card-text>
                     </v-card>
                 </v-flex>
+                            </v-layout>
+
+            <v-divider></v-divider>
+            <v-layout row wrap xs6>
 
                 <v-flex
-                    shrink
-                    pa-1>
+                    xs12>
                     <v-card
                     dark
                     color="green darken-1">
@@ -59,7 +64,7 @@
             </v-layout>
 
             <v-layout row wrap>
-                <v-flex xs12>
+                <v-flex xs6>
                     <v-card-actions>
                     <v-btn class="red--text darken-1" flat @click="bookDialog = false">Cancel</v-btn>
                     <v-btn class="green--text darken-1" flat @click="onBookTime">Confirm</v-btn>
@@ -82,7 +87,8 @@ export default {
             bookDialog: false,
             bookDate: null,
             bookTime: null,
-            date: new Date()
+            date: new Date(),
+            myWidth: '200'
 
         }
     },

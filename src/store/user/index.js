@@ -7,11 +7,15 @@ export default {
         user: null,
         loadedTrainers: [],
         loadedClients:  [],
-        loadedProfiles: []
+        loadedProfiles: [],
+        loadedRegistrations: []
     },
     mutations: {
         setLoadedTrainers (state, payload) {
             state.loadedTrainers = payload
+        },
+        setLoadedRegistrations (state, payload) {
+            state.loadedRegistrations = payload
         },
         setLoadedClients (state, payload) {
             state.loadedClients = payload
@@ -63,6 +67,30 @@ export default {
                     })
                 }
                 commit('setLoadedProfiles', profiles)
+                commit('setLoading', false)
+            })
+            .catch(
+                (error) => {
+                console.log(error)
+                commit('setLoading', false)
+                }
+            )
+        },
+        loadReg({commit}) {
+            commit('setLoading', true)
+            firebase.database().ref('registrations').once('value')
+            .then((data) => {
+                const reg = []
+                const obj = data.val()
+                for (let key in obj) {
+                    reg.push({
+                        ...obj[key],
+                            workoutid: key
+                    })
+                }
+                // console.log("REG")
+                // console.log(reg)
+                commit('setLoadedRegistrations', reg)
                 commit('setLoading', false)
             })
             .catch(
@@ -215,11 +243,20 @@ export default {
         registerUserForWorkout ({commit,getters}, payload) {
             commit('setLoading', true)
             const user = getters.user
+            let dk = null
             firebase.database().ref('/users/' + user.id).child('/registrations/')
                 .push(payload)
                 .then(data => {
-                    commit('setLoading', false)
+                    dk = data.key
                     commit('registerUserForWorkout', {id: payload, fbKey: data.key})
+                })
+                .then(() => {
+                    console.log("DK")
+                    console.log(dk)
+                    firebase.database().ref('/registrations/'+ payload).child(dk)
+                    .update({user: user.id})
+                    commit('setLoading', false)
+                    // commit('registerUserForWorkout', {id: payload, fbKey: data.key})
                 })
                 .catch(error => {
                     console.log(error)
@@ -236,8 +273,14 @@ export default {
             firebase.database().ref('/users/' + user.id + '/registrations').child(fbKey)
                 .remove()
                 .then(() => {
-                    commit('setLoading', false)
+                    // commit('setLoading', false)
                     commit('unRegisterUserFromWorkout', payload)
+                })
+                .then(() => {
+                    firebase.database().ref('/registrations/' + payload).child(fbKey)
+                    .remove()
+                    commit('setLoading', false)
+                    // commit('unRegisterUserFromWorkout', payload)
                 })
                 .catch(error => {
                     console.log(error)
@@ -700,8 +743,17 @@ export default {
                     return profile.id === profileid
                 })
             }
+        },
+        loadedRegistrations (state) {
+            return state.loadedRegistrations
+        },
+        loadedRegistration (state) {
+            return (workoutid) => {
+                return state.loadedRegistrations.find((workout) =>{
+                    return workout.id === workoutid
+                })
+            }
         }
-
 
     }
 }
