@@ -53,7 +53,7 @@
             <v-spacer></v-spacer>
 
             <app-membership-dialog
-            v-if="userIsAuthenticated && !userIsCreator && userIsMember">
+            v-if="userIsAuthenticated && !userIsCreator && userIsMember && isClient">
             </app-membership-dialog>
             <app-workout-register-dialog 
             :workoutId="workout.id" 
@@ -95,6 +95,11 @@ import 'es6-promise/auto';
         console.log('membership status')
         console.log(this.$store.getters.user.membership)
         return this.$store.getters.user.membership === 'none'
+      },
+      isClient () {
+        // console.log('membership status')
+        // console.log(this.$store.getters.user.membership)
+        return this.$store.getters.user.type === 'normal'
       },
       loading () {
         return this.$store.getters.loading

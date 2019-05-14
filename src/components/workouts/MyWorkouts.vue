@@ -51,8 +51,10 @@
 
     <v-layout row wrap 
     class="mb-2"
+    v-for="trainer in trainerProfile" 
+    :key="trainer"
     v-if="pvtWorkoutIsAvailable && !loading && !userIsMember && trainerProfile">
-      <v-flex xs12 offset-sm1 offset-md2>
+      <v-flex xs12 sm10 md8 offset-sm1 offset-md2>
 
         <v-card class="primary">
           <v-container fluid>
@@ -61,22 +63,23 @@
                 
                 <v-img
                 v-if="pvtWorkoutIsAvailable"
-                  :src="trainerProfile.imageUrl"
-                  height="230px"
-                  contain>
+                  :src="trainer.imageUrl"
+                  height="130px"
+                  contain 
+                  left>
                 </v-img>
 
                 <v-divider></v-divider>
 
                 <v-card-text>
-                  <h2 class="mb-0">Coach: {{trainerProfile.name}}</h2>
+                  <h2 class="mb-0">Coach: {{trainer.name}}</h2>
                 </v-card-text>
 
               </v-flex>
               <v-flex xs7 sm8 md9>
                 
                 <v-card-title primary-title>
-                    <h2 class="">Booking: {{privateWorkout.date | date}}</h2>
+                    <h2 class="">Booking: {{trainer.date | date}}</h2>
                 </v-card-title>
 
 
@@ -88,7 +91,7 @@
 
                 <v-card-actions>
                 <v-spacer></v-spacer>
-                  <v-btn flat color="secondary" @click="onUnRegisterPvtWorkout"><v-icon>cancel</v-icon></v-btn>
+                  <v-btn flat color="secondary" @click="onUnRegisterPvtWorkout(trainer.pvtid, trainer.id)"><v-icon>cancel</v-icon></v-btn>
                 </v-card-actions>
 
 
@@ -142,14 +145,11 @@
                 <v-card-actions>
                   <app-book-workout-dialog
                   :trainerid="trainer.id"
-                  v-if="!pvtWorkoutIsAvailable"
+                  
                   ></app-book-workout-dialog>
                 </v-card-actions>
 
 
-                  <v-card-text>
-            {{ pvtWorkoutIsAvailable ? 'First remove booked lesson to Book a workout' : '' }}
-                </v-card-text>
 
               </v-flex>
             </v-layout>
@@ -240,9 +240,20 @@
       },
       trainerProfile () {
         
-            // console.log('Loaded trainers')
-            // console.log(this.$store.getters.loadedTrainers)
-        return this.$store.getters.loadedTrainer(this.privateWorkout.trainer)        
+        const trai = this.$store.getters.user.privateWorkouts
+        const train = []
+          for(let key in trai){
+                    // console.log('LOADED TRAINER '+this.$store.getters.loadedTrainer(trai[key].trainer),
+              // trai[key].date)
+            train.push(
+              {...this.$store.getters.loadedTrainer(trai[key].trainer),
+              date: trai[key].date,
+              pvtid: trai[key].pvtid
+              }
+            
+            )
+        }
+        return train
       },
       privateWorkout () {
         
@@ -264,7 +275,7 @@
       hasPrivateWorkout () {
                     console.log('my workouts.vue')
             console.log(this.$store.getters.user)
-        return this.$store.getters.user.privateWorkouts !== null &&  this.$store.getters.user.privateWorkouts !== undefined
+        return this.$store.getters.user.privateWorkouts[0] !== null &&  this.$store.getters.user.privateWorkouts[0] !== undefined
       },
       pvtWorkoutIsAvailable () {
         if (!this.hasPrivateWorkout) {
@@ -283,9 +294,11 @@
 
     },
     methods: {
-        onUnRegisterPvtWorkout () {
+        onUnRegisterPvtWorkout (pvtid,otherID) {
+
             if (this.pvtWorkoutIsAvailable) {
-                this.$store.dispatch('unRegisterPrivateWorkout', this.privateWorkout.trainer)
+                this.$store.dispatch('LEunRegisterPrivateWorkout', {pvtid: pvtid,
+            otherID: otherID})
             } 
         }
     }

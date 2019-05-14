@@ -31,8 +31,9 @@ export default {
             // registeredWorkouts.splice(registeredWorkouts.findIndex(workout => workout.id === 
             //     payload), 1)
             // Reflect.deleteProperty(state.user.fbKeys, payload)
-
-            state.user.privateWorkouts = null
+            const privateWorkouts = state.user.privateWorkouts
+            privateWorkouts.splice(privateWorkouts.findIndex(workout => workout.pvtid === 
+                payload), 1)
         },
         registerUserForWorkout (state, payload) {
             const id = payload.id
@@ -190,19 +191,74 @@ export default {
                 }
             )
         },
+        LEregisterPrivateWorkout ({commit,getters}, payload) {
+            commit('setLoading', true)
+            const user = getters.user
+            let dk = null
+                // console.log("PAYLOAD" + payload.date + " BOOKING " + booking.date)
+            firebase.database().ref('/users/' + user.id).child('/privateWorkouts/')
+            .push({trainer: payload.trainerid})
+            .then(data => {
+                dk = data.key
+                firebase.database().ref('/users/' + user.id).child('/privateWorkouts/').child(dk)
+                .update({date: payload.date})
+            })
+                .then(data => {
+                    firebase.database().ref('/users/' + payload.trainerid+ '/privateWorkouts/').child(dk)
+                    .update({client: user.id,
+                        date: payload.date})
+                    .then(() => {
+                        commit('setLoading', false)
+                        commit('registerPrivateWorkout', {trainerid: payload.trainerid, date: payload.date, pvtid:dk})
+
+                    })
+                })
+                .catch(error => {
+                    console.log(error)
+                    commit('setLoading', false)
+                })
+        },
+        LEunRegisterPrivateWorkout ({commit,getters}, payload) {
+            commit('setLoading', true)
+            const user = getters.user
+            console.log('PVT ID>>>>>>'+payload.pvtid)
+            console.log('OTHER ID>>>>>>'+payload.otherID)
+
+            firebase.database().ref('/users/' + user.id + '/privateWorkouts/'+payload.pvtid)
+                .remove()
+                .then(() => {
+   
+                })
+                .then(() => {
+                    firebase.database().ref('/users/' + payload.otherID  +  '/privateWorkouts/'+payload.pvtid)
+                    .remove()
+                    .then(() => {
+                        commit('setLoading', false)
+                        commit('unRegisterPrivateWorkout', payload.pvtid)
+                        // console.log('Trainer id being deleted')
+                        // console.log(payload)
+                        // console.log('USER AFTER PRIVATE WORKOUT DELETED')
+                        // console.log(getters.user)
+                    })
+                })
+                .catch(error => {
+                    console.log(error)
+                    commit('setLoading', false)
+                })
+        },
         registerPrivateWorkout ({commit,getters}, payload) {
             commit('setLoading', true)
             const user = getters.user
             firebase.database().ref('/users/' + user.id).child('/privateWorkouts/')
             .update({trainer: payload.trainerid,
                     date: payload.date})
-                .then(() => {
+                .then(data => {
                     firebase.database().ref('/users/' + payload.trainerid).child('/privateWorkouts/')
                     .update({client: user.id,
                         date: payload.date})
-                    .then(() => {
+                    .then(data => {
                         commit('setLoading', false)
-                        commit('registerPrivateWorkout', {trainerid: payload.trainerid, date: payload.date})
+                        commit('registerPrivateWorkout', {trainerid: payload.trainerid, date: payload.date, pvtid: data.key})
 
                     })
                 })
@@ -487,15 +543,25 @@ export default {
                         ('value')
                         .then (data => {
                             const obj = data.val()
-                            let pvtworkouts = {
-                                ...obj
+                            let PrvWorkouts = []
+
+                            for (let key in obj) {
+                                PrvWorkouts.push(
+                                    {...obj[key],
+                                    pvtid: key}
+                                )
                             }
+
+                            // LeUser = {
+                            //     ...LeUser,
+                            //     privateWorkouts: PrvWorkouts
+                            // }
                             
-                            if(pvtworkouts.date != null){
-                                console.log("shit aint working")
+                            if(PrvWorkouts != null){
+                                console.log("shit is working")
                                 LeUser = {
                                     ...LeUser,
-                                    privateWorkouts: pvtworkouts
+                                    privateWorkouts: PrvWorkouts
                                 }
                             } else {
                                 LeUser = {

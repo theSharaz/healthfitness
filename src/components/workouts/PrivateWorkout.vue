@@ -42,6 +42,7 @@
 
             <v-layout row wrap 
             class="mb-2"
+                v-for="client in clientProfile" 
             v-if="pvtWorkoutIsAvailable && !loading">
                 <v-flex xs12 sm10 md8 offset-sm1 offset-md2>
 
@@ -49,15 +50,21 @@
                     <v-container fluid>
                         <v-layout row>
                         <v-flex xs5 sm4 md3>
-
+                                          <v-img
+                v-if="pvtWorkoutIsAvailable"
+                  :src="client.imageUrl"
+                  height="130px"
+                  contain 
+                  left>
+                </v-img>
 
                         </v-flex>
                         <v-flex xs7 sm8 md9>
                             
                             <v-card-title primary-title>
-                                <h2 class="">Booking for {{privateWorkout.date | date}} 
+                                <h2 class="">Booking for {{client.date | date}} 
                                 
-                                <v-btn flat color="secondary" @click="onUnRegisterPvtWorkout"><v-icon>cancel</v-icon></v-btn>
+                                <v-btn flat color="secondary" @click="onUnRegisterPvtWorkout(client.pvtid, client.id)"><v-icon>cancel</v-icon></v-btn>
 
                                 </h2>
                                 <v-spacer></v-spacer>
@@ -65,10 +72,10 @@
 
                             <v-card-text>
                             <div>
-                                <h2 class="mb-0">Client Name: {{clientProfile.name}}</h2>
-                                <h3 class="mb-0">Phone #: {{clientProfile.phone}} <span></span> Email: {{clientProfile.email}}</h3>
-                                <h3 class="mb-0">Weight: {{clientProfile.weight}}</h3>
-                                <h3 class="mb-0">Height: {{clientProfile.height}}</h3>
+                                <h2 class="mb-0">Client Name: {{client.name}}</h2>
+                                <h3 class="mb-0">Phone #: {{client.phone}} <span></span> Email: {{client.email}}</h3>
+                                <h3 class="mb-0">Weight: {{client.weight}}</h3>
+                                <h3 class="mb-0">Height: {{client.height}}</h3>
                             </div>
                             </v-card-text>
 
@@ -104,11 +111,22 @@
             console.log(this.$store.getters.loadedClients)
         return this.$store.getters.loadedClients
       },
-      clientProfile () {
-        
-            console.log('Loaded clients')
-            console.log(this.$store.getters.loadedClient(this.privateWorkout.client))
-        return this.$store.getters.loadedClient(this.privateWorkout.client)        
+      clientProfile () {    
+
+        const clie = this.$store.getters.user.privateWorkouts
+        const client = []
+          for(let key in clie){
+                    // console.log('LOADED TRAINER '+this.$store.getters.loadedTrainer(trai[key].trainer),
+              // trai[key].date)
+            client.push(
+              {...this.$store.getters.loadedClient(clie[key].client),
+              date: clie[key].date,
+              pvtid: clie[key].pvtid
+              }
+            
+            )
+        }
+        return client    
       },
       privateWorkout () {
         
@@ -128,7 +146,7 @@
         return true
       },
       hasPrivateWorkout () {
-        return this.$store.getters.user.privateWorkouts !== null &&  this.$store.getters.user.privateWorkouts !== undefined
+        return this.$store.getters.user.privateWorkouts[0] !== null &&  this.$store.getters.user.privateWorkouts[0] !== undefined
       },
       pvtWorkoutIsAvailable () {
         if (!this.hasPrivateWorkout) {
@@ -142,9 +160,11 @@
 
     },
     methods: {
-        onUnRegisterPvtWorkout () {
+        onUnRegisterPvtWorkout (pvtid,otherID) {
+
             if (this.pvtWorkoutIsAvailable) {
-                this.$store.dispatch('unRegisterPrivateWorkout', this.privateWorkout.client)
+                this.$store.dispatch('LEunRegisterPrivateWorkout', {pvtid: pvtid,
+            otherID: otherID})
             } 
         }
     }

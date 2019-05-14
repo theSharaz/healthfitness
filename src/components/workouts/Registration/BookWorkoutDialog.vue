@@ -114,7 +114,7 @@ export default {
                     console.log('new date')        
                     console.log(newDate)
 
-            this.$store.dispatch('registerPrivateWorkout',{
+            this.$store.dispatch('LEregisterPrivateWorkout',{
                 trainerid: this.trainerid,
                 date: newDate
             })

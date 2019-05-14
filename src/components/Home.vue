@@ -2,11 +2,8 @@
   <v-container>
 
     <v-layout row wrap mb-2>
-      <v-flex xs12 sm6 class="text-xs-center text-sm-right">
+      <v-flex xs12  class="text-xs-center">
         <v-btn large  router to='/gw' class='primary'>Explore Group Workouts</v-btn>     
-      </v-flex>
-      <v-flex xs12 sm6 class="text-xs-center text-sm-left">
-        <v-btn large  router to='/pvtw' class='primary'>Private Workouts</v-btn>      
       </v-flex>
     </v-layout>
 
